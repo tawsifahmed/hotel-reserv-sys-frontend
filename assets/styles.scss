@@ -1,0 +1,29 @@
+/* You can add global styles to this file, and also import other style files */
+
+$gutter: 1rem; //for primeflex grid system
+@import '@/assets/layout/styles/layout/layout.scss';
+
+/* Demos */
+@import '@/assets/demo/styles/flags/flags.css';
+@import '@/assets/demo/styles/badges.scss';
+
+
+.close-btn {
+    border-radius: 100%;
+    top: -5px;
+    right: -5px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    z-index: 9999;
+}
+
+
+.ac-btn {
+    height: 30px !important;
+    width: 30px !important;
+    font-size: 11px !important;
+
+    .p-button-icon{
+        font-size: 15px !important;
+    
+    }
+}
