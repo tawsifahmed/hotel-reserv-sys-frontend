@@ -6,9 +6,20 @@ const { layoutConfig, onMenuToggle } = useLayout();
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
+// import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
+// import { useAuthStore } from '~/store/auth'; // import the auth store we just created
+// // import { useRoute } from 'vue-router';
+// console.log('path', useRoute().path);
+
+// const { logUserOut } = useAuthStore(); // use authenticateUser action from  auth store
+// const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
 
 
-
+const logout = () => {
+  logUserOut();
+  router.push('/login');
+  // location.reload();
+};
 
 onMounted(() => {
     bindOutsideClickListener();
@@ -61,15 +72,29 @@ const isOutsideClicked = (event) => {
 
     return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
 };
+
+const isClient = ref();
+
+
+
+onMounted(() => {
+    if (router.currentRoute.value.path === '/' || router.currentRoute.value.path === '/my-orders') {
+        isClient.value = true;
+    } else {
+        isClient.value = false;
+    }
+});
 </script>
 
 <template>
     <div class="layout-topbar">
-        <router-link to="/" class="layout-topbar-logo">
+        <!-- <pre>{{isClient}}</pre> -->
+        <router-link to="/" class="layout-topbar-logo flex justify-content-center align-items-center">
             <img src="/demo/images/login/avatar.png" alt="logo" />
+            <h5 class="m-0" style="text-wrap:nowrap;">Hotel Reservation System</h5>
         </router-link>
 
-        <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
+        <button v-if="!isClient" class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
             <i class="pi pi-bars"></i>
         </button>
 

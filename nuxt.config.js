@@ -3,7 +3,7 @@ export default defineNuxtConfig({
     typescript: false,
     app: {
         head: {
-            title: 'Pera App',
+            title: 'Hotel Reservation System',
             link: [
                 {
                     id: 'theme-css',

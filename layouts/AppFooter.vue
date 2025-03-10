@@ -9,11 +9,15 @@ const logoUrl = computed(() => {
 
 <template>
     <div class="layout-footer">
-        <img title="Hotel Reservation System" class="footer-logo" src="/demo/images/login/avatar.png" alt="Logo" height="20" class="mr-2" />
+        <img title="Hotel Reservation System" src="/demo/images/login/avatar.png" alt="Logo" height="20" class="mr-2" />
         by<a class="font-medium" href="https://www.github.com/tawsifahmed" target="_blank" >Tawsif Ahmed Riyad</a>
     </div>
 </template>
 <style lang="scss" scoped>
+
+.footer-logo{
+    cursor: pointer;
+}
 .font-medium{
     margin-left: 0.35rem !important;
     font-size: small;
