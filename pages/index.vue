@@ -73,7 +73,7 @@ const endDate = ref(null);
 .main-wrapper {
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* Ensure the wrapper takes up at least the full viewport height */
+    min-height: 100vh; 
 }
 
 .dash-banner {

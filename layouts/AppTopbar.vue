@@ -73,12 +73,13 @@ const isOutsideClicked = (event) => {
     return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
 };
 
-const isClient = ref();
+const isClient = ref(true);
 
 
 
 onMounted(() => {
-    if (router.currentRoute.value.path === '/' || router.currentRoute.value.path === '/my-orders') {
+
+    if (router.currentRoute.value.path === '/' || router.currentRoute.value.path === '/my-bookings') {
         isClient.value = true;
     } else {
         isClient.value = false;
@@ -107,6 +108,10 @@ onMounted(() => {
                 <i class="pi pi-calendar"></i>
                 <span>Calendar</span>
             </button> -->
+            <NuxtLink to="/my-bookings" class="p-link layout-topbar-button">
+                <h5 class="text-nowrap mb-0">My Bookings</h5>
+                <span>My Bookings</span>
+            </NuxtLink>
             <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
                 <i class="pi pi-user"></i>
                 <span>Profile</span>
@@ -119,4 +124,9 @@ onMounted(() => {
     </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.text-nowrap{
+    text-wrap: nowrap;
+    color: inherit
+}
+</style>
