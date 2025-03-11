@@ -15,7 +15,7 @@ const model = ref([
     {
         label: 'Settings',
         items: [
-            { label: 'Reports', icon: 'pi pi-fw pi-flag', to: '/' },
+            { label: 'Reports', icon: 'pi pi-fw pi-flag', to: '/admin-dashboard/reports' },
         ]
     }
 ]);
