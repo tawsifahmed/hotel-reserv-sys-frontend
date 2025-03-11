@@ -4,6 +4,7 @@ import RadioButton from 'primevue/radiobutton';
 
 const url = useRuntimeConfig();
 definePageMeta({
+    middleware: 'auth',
     layout: 'default'
 });
 const startDate = ref('');

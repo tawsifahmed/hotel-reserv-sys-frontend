@@ -1,6 +1,7 @@
 <script setup>
 const url = useRuntimeConfig();
 definePageMeta({
+    middleware: 'auth',
     layout: 'default'
 });
 

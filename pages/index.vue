@@ -1,7 +1,14 @@
 <script setup>
+import apiLink from '../utils/apiLinks';
+const url = useRuntimeConfig();
+onMounted(() => {
+    console.log('Mounted', url);
+});
 import AppTopbar from '../layouts/AppTopbar.vue';
 import AppFooter from '../layouts/AppFooter.vue';
+import { onMounted } from 'vue';
 definePageMeta({
+    middleware: 'auth',
     layout: 'false'
 })
 
@@ -16,6 +23,8 @@ const endDate = ref(null);
         <!-- Full-width Banner Section -->
         <div class="dash-banner">
             <div class="banner-content">
+                <pre>{{url.public.apiUrl}}</pre>
+                <pre>{{apiLink}}</pre>
                 <h1 class="text-white">Welcome to <b>HRS's</b> <i>Hotel Reservation System</i></h1>
                 <h2 class="text-white">Book a suitable room for you and your loved ones!</h2>
             </div>

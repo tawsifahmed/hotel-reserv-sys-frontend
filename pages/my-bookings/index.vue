@@ -6,6 +6,7 @@ const url = useRuntimeConfig();
 
 
 definePageMeta({
+    middleware: 'auth',
     layout: 'false'
 });
 

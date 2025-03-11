@@ -6,13 +6,13 @@ const { layoutConfig, onMenuToggle } = useLayout();
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
-// import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
-// import { useAuthStore } from '~/store/auth'; // import the auth store we just created
+import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
+import { useAuthStore } from '~/store/auth'; // import the auth store we just created
 // // import { useRoute } from 'vue-router';
 // console.log('path', useRoute().path);
 
-// const { logUserOut } = useAuthStore(); // use authenticateUser action from  auth store
-// const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
+const { logUserOut } = useAuthStore(); // use authenticateUser action from  auth store
+const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
 
 
 const logout = () => {
