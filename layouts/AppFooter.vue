@@ -22,5 +22,6 @@ const logoUrl = computed(() => {
     margin-left: 0.35rem !important;
     font-size: small;
     color: black;
+    text-decoration: underline;
 }
 </style>

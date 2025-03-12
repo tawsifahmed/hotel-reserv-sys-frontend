@@ -7,19 +7,13 @@ definePageMeta({
     layout: 'default'
 });
 
-const isAdmin = ref(true);
-if(isAdmin.value === false){
-  throw createError({statusCode: 404, message: 'Access denied!', fatal: true})
-}
-
+const isAdmin = ref(accessPermission('admin'));
 
 import { FilterMatchMode } from 'primevue/api';
 
 import Column from 'primevue/column';
 
 import DataTable from 'primevue/datatable';
-
-
 
 const filters = ref();
 
@@ -30,21 +24,21 @@ const toast = useToast();
 
 const visibleCreateTag = ref(false);
 
-const visibleEditTag = ref(false);
+const visibleEditRoom = ref(false);
 
-const tagsLists = ref([]);
+const roomsList = ref([]);
 
-const visibleDeleteTag = ref(false);
+const visibleDeleteRoom = ref(false);
 
 const id = ref('');
 
 const name = ref('');
 
-const email = ref('');
+const seatNumbers = ref('');
 
-const phone = ref('');
+const priceTag = ref('');
 
-const address = ref('');
+const floorLayout = ref('');
 
 const closeCreateModal = (evn) => {
     visibleCreateTag.value = false;
@@ -52,7 +46,7 @@ const closeCreateModal = (evn) => {
 };
 
 const closeEditModal = (evn) => {
-    visibleEditTag.value = false;
+    visibleEditRoom.value = false;
     init();
 };
 
@@ -61,21 +55,21 @@ const handleCreateTagModal = () => {
     init();
 };
 
-const editTag = (data) => {
-    visibleEditTag.value = true;
+const editRoom = (data) => {
+    visibleEditRoom.value = true;
     id.value = data.id;
     name.value = data.name;
-    email.value = data.email;
-    phone.value = data.phone;
-    address.value = data.address;
+    seats.value = data.email;
+    floorLayout.value = data.floor;
+    priceTag.value = data.night_per_stay;
 };
 
-const deleteTag = (key) => {
-    visibleDeleteTag.value = true;
+const deleteRoom = (key) => {
+    visibleDeleteRoom.value = true;
     id.value = key;
 };
 
-const confirmDeleteTag = async () => {
+const confirmDeleteRoom = async () => {
     loading1.value = true;
     const token = useCookie('token');
     const { data, pending } = await useFetch(`${url.public.apiUrl}/tag/delete/${id.value}`, {
@@ -86,7 +80,7 @@ const confirmDeleteTag = async () => {
     });
 
     if (data.value.code === 200) {
-        visibleDeleteTag.value = false;
+        visibleDeleteRoom.value = false;
         toast.add({ severity: 'success', summary: 'Success', detail: 'Tag Deleted successfully!', group: 'br', life: 3000 });
         loading1.value = false;
         init();
@@ -99,14 +93,14 @@ const confirmDeleteTag = async () => {
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('tagsList', () =>
-        $fetch(`${url.public.apiUrl}/tag/list`, {
+        $fetch(`${url.public.apiUrl}/api/v1/rooms`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
         })
     );
-    if (data.value?.data?.length > 0) {
-        tagsLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
+    if (data.value?.length > 0) {
+        roomsList.value = data.value?.map((item, index) => ({ ...item, index: index + 1 }));
     }
 };
 
@@ -117,6 +111,9 @@ const initFilters = () => {
 };
 onMounted(() => {
     init();
+    if (isAdmin.value === false) {
+        throw createError({ statusCode: 404, message: 'Access denied!', fatal: true });
+    }
     loading.value = false;
 });
 
@@ -131,9 +128,6 @@ initFilters();
         <Toolbar class="border-0 px-0">
             <template #start>
                 <Button icon="pi pi-plus" label="Create" @click="handleCreateTagModal" class="mr-2" severity="secondary" />
-                <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
-                <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" />
-                <Button icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" /> -->
             </template>
 
             <template #end>
@@ -145,41 +139,48 @@ initFilters();
                 </IconField>
             </template>
         </Toolbar>
-
-        <DataTable v-model:filters="filters" class="table-st" :value="tagsLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
+        <!-- <pre>        {{roomsList}}
+        </pre> -->
+        <DataTable v-model:filters="filters" class="table-st" :value="roomsList" stripedRows paginator tableStyle="min-width: 50rem" :rows="20" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
 
-            <Column field="name" header="Room No"></Column>
-            <Column field="name" header="Floor Layout"></Column>
-            <Column field="name" header="Seats"></Column>
-            <Column field="name" header="Price"></Column>
-            <!-- <Column field="email" sortable header="Email Address"></Column> -->
-            <!-- <Column field="phone" sortable header="Phone Number"></Column> -->
+            <Column field="name" header="Room No."></Column>
+            <Column field="floor.name" header="Floor Layout"></Column>
+            <Column field="seats" header="No. of Seats"></Column>
+            <Column field="price_per_night" header="Price">
+                <template #body="slotProps"> 
+                <i>
+                    <b>
+                        $
+                    </b>
+                    {{ slotProps.data.price_per_night }}
+                </i>    
+                </template>
+            </Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">
-                    <Button icon="pi pi-pencil" text class="" severity="success" rounded @click="editTag(slotProps.data)" />
-                    <Button icon="pi pi-pencil" text class="" severity="success" rounded style="visibility: hidden" />
-                </template>  
+                    <Button icon="pi pi-pencil" text class="" severity="success" rounded @click="editRoom(slotProps.data)" />
+                    <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteRoom(slotProps.data.id)" />
+                </template>
             </Column>
-            <!-- <template #footer> In total there are {{ tagsLists ? tagsLists.length : 0 }} rows. </template> -->
         </DataTable>
 
         <!-- Create -->
         <Dialog v-model:visible="visibleCreateTag" modal header="Create Tag" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TagsCreateTag @closeCreateModal="closeCreateModal($event)" />
+            <RoomsCreateRoom @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit -->
-        <Dialog v-model:visible="visibleEditTag" modal header="Edit Tag" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TagsEditTag :param="{ id, name }" @closeEditModal="closeEditModal($event)" />
+        <Dialog v-model:visible="visibleEditRoom" modal header="Edit Tag" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <RoomsEditRoom :param="{ id, name }" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
-        <Dialog v-model:visible="visibleDeleteTag" header=" " dismissableMask="true" :style="{ width: '25rem' }">
+        <Dialog v-model:visible="visibleDeleteRoom" header=" " dismissableMask="true" :style="{ width: '25rem' }">
             <p>Are you sure you want to delete?</p>
-            <Button label="No" icon="pi pi-times" text @click="visibleDeleteTag = false" />
-            <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteTag" :loading="loading1" />
+            <Button label="No" icon="pi pi-times" text @click="visibleDeleteRoom = false" />
+            <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteRoom" :loading="loading1" />
         </Dialog>
 
         <!-- Invite User -->

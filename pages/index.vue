@@ -20,11 +20,10 @@ const endDate = ref(null);
     <div class="main-wrapper">
         <AppTopbar />
         
-        <!-- Full-width Banner Section -->
         <div class="dash-banner">
             <div class="banner-content">
-                <pre>{{url.public.apiUrl}}</pre>
-                <pre>{{apiLink}}</pre>
+                <!-- <pre>{{url.public.apiUrl}}</pre>
+                <pre>{{apiLink}}</pre> -->
                 <h1 class="text-white">Welcome to <b>HRS's</b> <i>Hotel Reservation System</i></h1>
                 <h2 class="text-white">Book a suitable room for you and your loved ones!</h2>
             </div>
@@ -41,10 +40,9 @@ const endDate = ref(null);
                             <Calendar v-model="endDate" @date-select="handleChange('endtDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
                         </div>
                         <div class="flex-auto">
-                            <!-- <pre>{{selectedProject.id}}</pre> -->
-                            <label for="icondisplay" class="font-bold block mb-2 dash-labels">Room Type: </label>
+                            <label for="icondisplay" class="font-bold block mb-2 dash-labels">Floor: (Optional) </label>
                             <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects"
-                            optionLabel="name" placeholder="Select room type (Optional)" />
+                            optionLabel="name" placeholder="Select floor (Optional)" />
                         </div>
                     </div>
                 </template>

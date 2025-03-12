@@ -6,10 +6,7 @@ definePageMeta({
     layout: 'default'
 });
 
-const isAdmin = ref(true);
-if(isAdmin.value === false){
-  throw createError({statusCode: 404, message: 'Access denied!', fatal: true})
-}
+const isAdmin = ref(accessPermission('admin'));
 
 const url = useRuntimeConfig();
 import { FilterMatchMode } from 'primevue/api';
@@ -27,6 +24,7 @@ const loading1 = ref(false);
 const toast = useToast();
 
 import Dialog from 'primevue/dialog';
+import { ref } from 'vue';
 
 const visibleCreateUser = ref(false);
 
@@ -35,7 +33,7 @@ const visibleEditUser = ref(false);
 
 const usersLists = ref([]);
 
-const visibleDeleteEmployee = ref(false);
+const visibleDeleteUser = ref(false);
 
 const id = ref('');
 
@@ -47,9 +45,7 @@ const phone = ref('');
 
 const address = ref('');
 
-const rolesLists = ref([]);
-
-const user_type = ref([]);
+const userType = ref([]);
 
 const employeeId = ref('');
 
@@ -67,12 +63,6 @@ const handleCreateUserModal = () => {
     visibleCreateUser.value = true;
 };
 
-
-const closeInviteModal = (evn) => {
-    visibleInviteUser.value = false;
-    init();
-};
-
 const selectedRoles = ref([]);
 const filterRoles = ref([]);
 
@@ -83,7 +73,7 @@ const editUser = (data) => {
     email.value = data.email;
     phone.value = data.phone;
     address.value = data.address;
-    user_type.value = data.user_type;
+    userType.value = data.type;
     employeeId.value = data.employee_id;
     rolesLists.value.map((item) => {
         if (item.name === data.user_type) {
@@ -93,14 +83,19 @@ const editUser = (data) => {
 };
 
 const deleteEmployee = (key) => {
-    visibleDeleteEmployee.value = true;
-    id.value = key;
+    if(key === 1){
+        toast.add({ severity: 'error', summary: 'Error', detail: 'You can not delete root user!', group: 'br', life: 3000 });
+        return;
+    }else{
+        visibleDeleteUser.value = true;
+        id.value = key;
+    }
 };
 
-const confirmDeleteEmployee = async () => {
+const confirmDeleteUser = async () => {
     loading1.value = true;
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`${url.public.apiUrl}/users/delete/${id.value}`, {
+    const { data, pending } = await useFetch(`${url.public.apiUrl}/api/v1/users/delete/${id.value}`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -108,29 +103,22 @@ const confirmDeleteEmployee = async () => {
     });
 
     if (data.value.code === 200) {
-        visibleDeleteEmployee.value = false;
-        toast.add({ severity: 'success', summary: 'Success', detail: 'Employee Deleted successfully!', group: 'br', life: 3000 });
+        visibleDeleteUser.value = false;
+        toast.add({ severity: 'success', summary: 'Success', detail: 'User deleted successfully!', group: 'br', life: 3000 });
         loading1.value = false;
         init();
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Employee Deleted Failed!', group: 'br', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete user!', group: 'br', life: 3000 });
         loading1.value = false;
     }
 
 };
 
-const userI = ref();
 
-
-const changeAttribute = async () => {
-    userI.value = selectedRoles.value ? selectedRoles.value.map((item) => item.id) : '';
-    init(userI.value);
-}
-
-const init = async (userTypes) => {
+const init = async () => {
     const token = useCookie('token');
-    const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
-        $fetch(`${url.public.apiUrl}/users/list${userTypes ? `?role_id=${userTypes}` : ''}`, {
+    const { data, pending, error } = await useAsyncData('usersData', () =>
+        $fetch(`${url.public.apiUrl}/api/v1/users/list`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
@@ -141,22 +129,7 @@ const init = async (userTypes) => {
     }
 };
 
-const getRoleList = async () => {
-    const token = useCookie('token');
-    const { data, pending, error } = await useAsyncData('roleLiist', () =>
-        $fetch(`${url.public.apiUrl}/roles/list`, {
-            headers: {
-                Authorization: `Bearer ${token.value}`
-            }
-        })
-    );
-    if (data.value?.data?.length > 0) {
-        // console.log('data', data.value?.data);
-        rolesLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
-        filterRoles.value = data.value?.data.map((item) => ({ name: item.name, id: item.id }));
-        console.log('rolesLists', rolesLists.value);
-    }
-};
+
 
 const initFilters = () => {
     filters.value = {
@@ -164,44 +137,14 @@ const initFilters = () => {
     };
 };
 
-const rolePermission = useCookie('rolePermission');
-
-
 onMounted(() => {
     init();
-    getRoleList();
+    if(isAdmin.value === false){
+  throw createError({statusCode: 404, message: 'Access denied!', fatal: true})
+}
     loading.value = false;
 });
-
 initFilters();
-
-const downloadTaskSheet = () => {
-    if (usersLists.value.length > 0) {
-        const csvContent =
-            'data:text/csv;charset=utf-8,' +
-            '"Serial No.","Employee Name","Email","Phone","Address","User Type",\n' +
-            usersLists.value.map((task, index) => {
-                    const serialNo = index + 1;
-                    const employeeName = task.name;
-                    const email = task.email;
-                    const phone = task.phone;
-                    const address = task.address;
-                    const userType = task.user_type;
-
-                    return `"${serialNo}","${employeeName}","${email}","${phone}","${address}","${userType}"`;
-                })
-                .join('\n');
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement('a');
-        link.setAttribute('href', encodedUri);
-        link.setAttribute('download', 'tasks.csv');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);    
-    } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'No data found to download', group: 'br', life: 3000 });
-    }
-};
 
 </script>
 
@@ -252,7 +195,7 @@ const downloadTaskSheet = () => {
             <Column field="name" header="User Name"></Column>
             <Column field="email" header="Email Address"></Column>
             <Column field="phone" header="Phone"></Column>
-            <Column field="user_type" header="User Type"></Column>
+            <Column field="type" header="User Type"></Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">
                     <Button  icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editUser(slotProps.data)" />
@@ -262,24 +205,19 @@ const downloadTaskSheet = () => {
         </DataTable>
 
         <!-- Create -->
-        <Dialog v-model:visible="visibleCreateUser" modal header="Create Employee" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <CreateEmployee :param="{ rolesLists }" @closeCreateModal="closeCreateModal($event)" />
+        <Dialog v-model:visible="visibleCreateUser" modal header="Create User" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <UserCreateUser :param="{ rolesLists }" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
-        <!-- Edit -->
-        <Dialog v-model:visible="visibleEditUser" modal header="Edit Employee" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <editUser :param="{ id, name, address, phone, email, user_type, employeeId, rolesLists }" @closeEditModal="closeEditModal($event)" />
+        <!-- Edit ------->
+        <Dialog v-model:visible="visibleEditUser" modal header="Edit User" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <UserEditUser :param="{ id, name, address, phone, email, userType }" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
-        <Dialog v-model:visible="visibleDeleteEmployee" header=" " :style="{ width: '25rem' }" dismissableMask="true">
+        <Dialog v-model:visible="visibleDeleteUser" header=" " :style="{ width: '25rem' }" dismissableMask="true">
             <p>Are you sure you want to delete?</p>
-            <Button label="No" icon="pi pi-times" text @click="visibleDeleteEmployee = false" />
-            <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteEmployee" :loading="loading1"/>
-        </Dialog>
-
-        <!-- Invite User -->
-        <Dialog v-model:visible="visibleInviteUser" modal header="Invite Employee" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <InviteGuest :param="{ rolesLists }" @closeInviteModal="closeInviteModal($event)" />
+            <Button label="No" icon="pi pi-times" text @click="visibleDeleteUser = false" />
+            <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteUser" :loading="loading1"/>
         </Dialog>
     </div>
 </template>

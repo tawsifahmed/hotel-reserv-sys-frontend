@@ -1,14 +1,19 @@
 <script setup>
+import { useFloorStore } from '~/store/floors';
+import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
+import accessPermission from '~/composables/userTypeChecker';
+
+const { getFloors } = useFloorStore();
+const { floorList, floorsLength } = storeToRefs(useFloorStore());
+
 const url = useRuntimeConfig();
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
 });
 
-const isAdmin = ref(true);
-if(isAdmin.value === false){
-  throw createError({statusCode: 404, message: 'Access denied!', fatal: true})
-}
+const isAdmin = ref(accessPermission('admin'));
+
 
 import { FilterMatchMode } from 'primevue/api';
 
@@ -25,13 +30,13 @@ const loading1 = ref(false);
 
 const toast = useToast();
 
-const visibleCreateTag = ref(false);
+const visibleCreateFloor = ref(false);
 
-const visibleEditTag = ref(false);
+const visibleEditFloor = ref(false);
 
 const tagsLists = ref([]);
 
-const visibleDeleteTag = ref(false);
+const visibleDeleteFloor = ref(false);
 
 const id = ref('');
 
@@ -44,80 +49,71 @@ const phone = ref('');
 const address = ref('');
 
 const closeCreateModal = (evn) => {
-    visibleCreateTag.value = false;
-    init();
+    visibleCreateFloor.value = false;
+    getFloors();
 };
 
 const closeEditModal = (evn) => {
-    visibleEditTag.value = false;
-    init();
+    visibleEditFloor.value = false;
+    getFloors();
 };
 
-const handleCreateTagModal = () => {
-    visibleCreateTag.value = true;
-    init();
+const handleCreateFloorModal = () => {
+    visibleCreateFloor.value = true;
+    getFloors();
 };
 
-const editTag = (data) => {
-    visibleEditTag.value = true;
+const editFloor = (data) => {
+    visibleEditFloor.value = true;
     id.value = data.id;
     name.value = data.name;
-    email.value = data.email;
-    phone.value = data.phone;
-    address.value = data.address;
 };
 
-const deleteTag = (key) => {
-    visibleDeleteTag.value = true;
+const deleteFloor = (key) => {
+    visibleDeleteFloor.value = true;
     id.value = key;
 };
 
-const confirmDeleteTag = async () => {
+const confirmDeleteFloor = async () => {
     loading1.value = true;
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`${url.public.apiUrl}/tag/delete/${id.value}`, {
+    const { data, pending } = await useFetch(`${url.public.apiUrl}/api/v1/floors/delete/${id.value}`, {
         method: 'DELETE',
         headers: {
-            Authorization: `Bearer ${token.value}`
+            Authorization: `Bearer ${token.value}`,
+
         }
     });
 
     if (data.value.code === 200) {
-        visibleDeleteTag.value = false;
-        toast.add({ severity: 'success', summary: 'Success', detail: 'Tag Deleted successfully!', group: 'br', life: 3000 });
+        visibleDeleteFloor.value = false;
+        toast.add({ severity: 'success', summary: 'Success', detail: 'Floor deleted successfully!', group: 'br', life: 3000 });
         loading1.value = false;
-        init();
+        if(floorsLength.value === 1){
+            location.reload();
+        }
+        getFloors();
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Tag Deleted Failed!', group: 'br', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Floor deleted Failed!', group: 'br', life: 3000 });
         loading1.value = false;
-    }
-};
-
-const init = async () => {
-    const token = useCookie('token');
-    const { data, pending, error } = await useAsyncData('tagsList', () =>
-        $fetch(`${url.public.apiUrl}/tag/list`, {
-            headers: {
-                Authorization: `Bearer ${token.value}`
-            }
-        })
-    );
-    if (data.value?.data?.length > 0) {
-        tagsLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
     }
 };
 
 const initFilters = () => {
     filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+        global: { value: null, matchMode: FilterMatchMode?.CONTAINS }
     };
 };
-onMounted(() => {
-    init();
-    loading.value = false;
-});
 
+getFloors();
+onMounted(() => {
+    loading.value = false;
+    if(isAdmin.value === false){
+  throw createError({statusCode: 404, message: 'Access denied!', fatal: true})
+}
+});
 initFilters();
+
 </script>
 
 <template>
@@ -127,7 +123,7 @@ initFilters();
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
-                <Button icon="pi pi-plus" label="Create" @click="handleCreateTagModal" class="mr-2" severity="secondary" />
+                <Button icon="pi pi-plus" label="Create" @click="handleCreateFloorModal" class="mr-2" severity="secondary" />
                 <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" /> -->
@@ -143,7 +139,7 @@ initFilters();
             </template>
         </Toolbar>
 
-        <DataTable v-model:filters="filters" class="table-st" :value="tagsLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-st" :value="floorList" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
@@ -153,30 +149,28 @@ initFilters();
             <!-- <Column field="phone" sortable header="Phone Number"></Column> -->
             <Column field="action" header="Action">
                 <template #body="slotProps">
-                    <Button icon="pi pi-pencil" text class="" severity="success" rounded @click="editTag(slotProps.data)" />
-                    <Button icon="pi pi-pencil" text class="" severity="success" rounded style="visibility: hidden" />
+                    <Button icon="pi pi-pencil" text class="" severity="success" rounded @click="editFloor(slotProps.data)" />
+                    <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteFloor(slotProps.data.id)" />    
                 </template>  
             </Column>
             <!-- <template #footer> In total there are {{ tagsLists ? tagsLists.length : 0 }} rows. </template> -->
         </DataTable>
 
         <!-- Create -->
-        <Dialog v-model:visible="visibleCreateTag" modal header="Create Tag" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TagsCreateTag @closeCreateModal="closeCreateModal($event)" />
+        <Dialog v-model:visible="visibleCreateFloor" modal header="Create Floor" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <FloorsCreateFloor @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit -->
-        <Dialog v-model:visible="visibleEditTag" modal header="Edit Tag" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TagsEditTag :param="{ id, name }" @closeEditModal="closeEditModal($event)" />
+        <Dialog v-model:visible="visibleEditFloor" modal header="Edit Floor" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <FloorsEditFloor :param="{ id, name }" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
-        <Dialog v-model:visible="visibleDeleteTag" header=" " dismissableMask="true" :style="{ width: '25rem' }">
+        <Dialog v-model:visible="visibleDeleteFloor" header=" " dismissableMask="true" :style="{ width: '25rem' }">
             <p>Are you sure you want to delete?</p>
-            <Button label="No" icon="pi pi-times" text @click="visibleDeleteTag = false" />
-            <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteTag" :loading="loading1" />
+            <Button label="No" icon="pi pi-times" text @click="visibleDeleteFloor = false" />
+            <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteFloor" :loading="loading1" />
         </Dialog>
-
-        <!-- Invite User -->
         <Toast position="bottom-right" group="br" />
     </div>
 </template>

@@ -2,6 +2,10 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from './composables/layout';
 import { useRouter } from 'vue-router';
+import accessPermission from '~/composables/userTypeChecker';
+
+const isAdmin = ref(accessPermission('admin'));
+
 const { layoutConfig, onMenuToggle } = useLayout();
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
@@ -79,7 +83,7 @@ const isClient = ref(true);
 
 onMounted(() => {
 
-    if (router.currentRoute.value.path === '/' || router.currentRoute.value.path === '/my-bookings') {
+    if (router.currentRoute.value.path === '/' || router.currentRoute.value.path === '/my-bookings' ) {
         isClient.value = true;
     } else {
         isClient.value = false;
@@ -108,10 +112,22 @@ onMounted(() => {
                 <i class="pi pi-calendar"></i>
                 <span>Calendar</span>
             </button> -->
-            <NuxtLink to="/my-bookings" class="p-link layout-topbar-button">
-                <h5 class="text-nowrap mb-0">My Bookings</h5>
-                <span>My Bookings</span>
-            </NuxtLink>
+                <NuxtLink v-if="!isAdmin" to="/my-bookings" class="p-link layout-topbar-button mr-5">
+                    <h5 class="text-nowrap mb-0">My Bookings</h5>
+                    <span>My Bookings</span>
+                </NuxtLink>
+                <div class="mr-4">
+                    <NuxtLink v-if="!isClient" to="/admin-dashboard" class="p-link layout-topbar-button mr-5">
+                        <h5 class="text-nowrap mb-0">Admin Dashboard</h5>
+                        <span>Admin Dashboard</span>
+                    </NuxtLink>
+                    
+                    <NuxtLink v-else to="/admin-dashboard" class="p-link layout-topbar-button mr-5">
+                        <h5 class="text-nowrap mb-0">Admin Dashboard</h5>
+                        <span>Admin Dashboard</span>
+                    </NuxtLink>
+                    
+                </div>
             <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
                 <i class="pi pi-user"></i>
                 <span>Profile</span>
