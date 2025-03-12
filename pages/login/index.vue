@@ -2,6 +2,9 @@
 import { useLayout } from '@/layouts/composables/layout';
 import { ref, computed } from 'vue';
 import AppConfig from '@/layouts/AppConfig.vue';
+import accessPermission from '~/composables/userTypeChecker';
+
+const isAdmin = ref(accessPermission('admin'));
 const { layoutConfig } = useLayout();
 const logoUrl = computed(() => {
     return `/layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
@@ -27,7 +30,7 @@ const forgotOtp = ref('');
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useAuthStore } from '~/store/auth'; // import the auth store we just created
 const { authenticateUser, otpVerify, resendOtp, forgotPassword, forgotPasswordOtp, passwordReset } = useAuthStore(); // use authenticateUser action from  auth store
-const { authenticated, checkOTP, resendOtpResponse, resendOtpMsg, authOtp, resetState } = storeToRefs(useAuthStore());
+const { authenticated, checkOTP, resendOtpResponse, resendOtpMsg, authOtp, checkType } = storeToRefs(useAuthStore());
 
 import Checkbox from 'primevue/checkbox';
 import RadioButton from 'primevue/radiobutton';
@@ -96,7 +99,11 @@ const handleLoginSubmit = async () => {
             errorData.value.emailError = false;
             toast.add({ severity: 'success', summary: 'Authorized', detail: 'Login Successful', group: 'br', life: 3000 });
             setTimeout(() => {
+            if (checkType.value === 'admin') {
+                router.push('/admin-dashboard');
+            } else {
                 router.push('/');
+            }
             }, 450);
         } else {
             toast.add({ severity: 'error', summary: 'Authorization Failed!', detail: 'Invalid email or password', group: 'br', life: 3000 });

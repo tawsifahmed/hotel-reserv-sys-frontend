@@ -1,9 +1,17 @@
 <script setup>
+import accessPermission from '~/composables/userTypeChecker';
+
 const url = useRuntimeConfig();
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
 });
+
+const isAdmin = ref(true);
+if(isAdmin.value === false){
+  throw createError({statusCode: 404, message: 'Access denied!', fatal: true})
+}
+
 
 import { FilterMatchMode } from 'primevue/api';
 

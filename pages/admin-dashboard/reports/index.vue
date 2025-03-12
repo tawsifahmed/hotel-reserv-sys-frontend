@@ -1,4 +1,6 @@
 <script setup>
+import accessPermission from '~/composables/userTypeChecker';
+
 import { storeToRefs } from 'pinia';
 import RadioButton from 'primevue/radiobutton';
 
@@ -7,6 +9,12 @@ definePageMeta({
     middleware: 'auth',
     layout: 'default'
 });
+
+const isAdmin = ref(true);
+if(isAdmin.value === false){
+  throw createError({statusCode: 404, message: 'Access denied!', fatal: true})
+}
+
 const startDate = ref('');
 
 const endDate = ref('');

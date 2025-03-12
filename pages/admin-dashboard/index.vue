@@ -1,10 +1,18 @@
 <script setup>
 import { useLayout } from '@/layouts/composables/layout';
 import { onMounted, reactive, ref, watch } from 'vue';
+import accessPermission from '~/composables/userTypeChecker';
 
 definePageMeta({
+      middleware: 'auth',
       layout: 'default'
-  })
+})
+
+const isAdmin = ref(accessPermission('admin'));
+if(isAdmin.value === false){
+  throw createError({statusCode: 404, message: 'Access denied!', fatal: true})
+}
+
 
 const { isDarkTheme } = useLayout();
 const lineData = reactive({
@@ -116,7 +124,7 @@ watch(
 </script>
 
 <template>
-    <div class="grid">
+    <div v-if="isAdmin" class="grid">
         <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <div class="flex justify-content-between mb-3">

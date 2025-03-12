@@ -5,6 +5,11 @@ definePageMeta({
     layout: 'default'
 });
 
+const isAdmin = ref(true);
+if(isAdmin.value === false){
+  throw createError({statusCode: 404, message: 'Access denied!', fatal: true})
+}
+
 import { FilterMatchMode } from 'primevue/api';
 
 import Column from 'primevue/column';

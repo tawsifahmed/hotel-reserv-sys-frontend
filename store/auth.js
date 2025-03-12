@@ -8,12 +8,13 @@ export const useAuthStore = defineStore('auth', {
     userProfile: null,
     detectDuplicateEmail: false,
     resetState: null,
-    resetToken: ''
+    resetToken: '',
+    checkType: '',
   }),
 
   actions: {
     async authenticateUser({ email, password }) {
-      this.loading = true; // Set loading to true when the request starts
+      this.loading = true;
       
       try {
         const { data, error } = await useFetch(`${apiLink}/api/v1/login`, {
@@ -24,10 +25,7 @@ export const useAuthStore = defineStore('auth', {
             password,
           },
         });
-
-        // Check for errors
         if (error.value) {
-          // Handle 401 error (unauthorized)
           if (error.value?.data?.code === 401) {
             this.authenticated = false;
             console.error("Authentication failed. Invalid credentials.");
@@ -35,10 +33,14 @@ export const useAuthStore = defineStore('auth', {
           return;
         }
 
-        // If response contains valid data
         if (data.value && data.value.code === 200) {
           const token = useCookie('token');
           token.value = data.value?.access_token;
+          const userType = useCookie('userType');
+          userType.value = data.value?.type;
+          this.checkType = data.value?.type;
+          console.log('User Type:', userType.value);
+          // return;
           this.authenticated = true;
           console.log('User authenticated successfully:', data.value);
         } else {
@@ -50,13 +52,12 @@ export const useAuthStore = defineStore('auth', {
       } catch (error) {
         console.error("An error occurred during login:", error);
       } finally {
-        this.loading = false; // Set loading to false after request completion
+        this.loading = false;
       }
     },
 
-    // Register user and handle errors
     async registerUser({ userName, email, password, confirmPass }) {
-      this.loading = true; // Set loading to true when the request starts
+      this.loading = true;
       
       try {
         const { data, error } = await useFetch(`${apiLink}/api/v1/register`, {
@@ -67,10 +68,10 @@ export const useAuthStore = defineStore('auth', {
             email: email,
             password: password,
             password_confirmation: confirmPass,
+            type: 'client'
           },
         });
 
-        // Check for duplicate email (422 error)
         if (error.value?.data?.code === 422) {
           this.detectDuplicateEmail = true;
           this.userCreated = false;
@@ -78,19 +79,17 @@ export const useAuthStore = defineStore('auth', {
           return;
         }
 
-        // If registration is successful
         if (data.value?.code === 201) {
           this.detectDuplicateEmail = false;
           this.userCreated = true;
           console.log('User created successfully:', data.value);
-          // Automatically log the user in after successful registration
           await this.authenticateUser({ email, password });
             window.location.reload();
         }
       } catch (error) {
         console.error("An error occurred during registration:", error);
       } finally {
-        this.loading = false; // Set loading to false after request completion
+        this.loading = false;
       }
     },
     async forgotPassword(email) {
@@ -151,6 +150,8 @@ export const useAuthStore = defineStore('auth', {
       const token = useCookie('token');
       this.authenticated = false;
       token.value = null;
+      const userType = useCookie('userType');
+      userType.value = null;
     },
   },
 });
