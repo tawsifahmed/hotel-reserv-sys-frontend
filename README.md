@@ -1,7 +1,10 @@
-# Nuxt 3 Minimal Starter
+# Hotel Reservation System - Vue 3
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
-
+## Config
+The api end point has to be configured in the utils folder -
+```bash
+./utils/apiLink.js
+```
 ## Setup
 
 Make sure to install the dependencies:
@@ -38,5 +41,3 @@ Locally preview production build:
 ```bash
 npm run preview
 ```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
