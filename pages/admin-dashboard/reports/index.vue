@@ -18,12 +18,16 @@ if(isAdmin.value === false){
 const startDate = ref('');
 
 const endDate = ref('');
-const selectedProject = ref();
+const selectedStatus = ref();
 const previewData = ref(null);
 const loading = ref(false);
 const loading1 = ref(false);
 const toast = useToast();
-
+const statusList = ref([
+    { name: 'Pending', code: 'pending' },
+    { name: 'Approved', code: 'confirmed' },
+    { name: 'Cancelled', code: 'cancelled' },
+])
 // Date Formatter
 const dateFormatter = (data) => {
     const dateStr = data;
@@ -49,8 +53,8 @@ const handleGenerate = async () => {
     // formData.append('user_id[]', userIds);
 
     // Only append project IDs if there are valid projects selected
-    if (selectedProject.value && selectedProject.value.length > 0) {
-        const projectIds = selectedProject.value?.map((item) => item.id);
+    if (selectedStatus.value && selectedStatus.value.length > 0) {
+        const projectIds = selectedStatus.value?.map((item) => item.id);
         console.log('Project ID', projectIds);
         if (projectIds.length > 0) {
             projectIds.forEach((id) => {
@@ -89,29 +93,13 @@ const handleReportDownload = async () => {
     }
     const formattedStartDate = dateFormatter(startDate.value);
     const formattedEndDate = dateFormatter(endDate.value);
-    const formData = new FormData();
 
-    if (selectedProject.value && selectedProject.value.length > 0) {
-        const projectIds = selectedProject.value?.map((item) => item.id);
-        console.log('Project ID', projectIds);
-        if (projectIds.length > 0) {
-            projectIds.forEach((id) => {
-                formData.append('project_id[]', id);
-            });
-        }
-    }
-
-    if (startDate.value && endDate.value) {
-        formData.append('start_due_date', formattedStartDate);
-        formData.append('end_due_date', formattedEndDate);
-    }
-
-    const { data, error } = await useFetch(`${url.public.apiUrl}/tasks/project-wise-task-report-download`, {
-        method: 'POST',
+    const { data, error } = await useFetch(`${url.public.apiUrl}/api/v1/reservations/export-excel${startDate.value ? `?start_date=${formattedStartDate}` : ''}${endDate.value ? `${startDate.value ? '&' : '?'}end_date=${formattedEndDate}` : ''}${selectedStatus.value ? `${startDate.value || endDate.value ? '&' : '?'}status=${selectedStatus.value.code}` : ''}`, {
+        method: 'GET',
         headers: {
             Authorization: `Bearer ${token.value}`
         },
-        body: formData
+        // body: formData
     });
     if (error.value) {
         console.log(error);
@@ -148,7 +136,7 @@ onMounted(() => {
 const handleReset = () => {
     startDate.value = '';
     endDate.value = '';
-    selectedProject.value = [];
+    selectedStatus.value = [];
     previewData.value = null;
 };
 </script>
@@ -157,9 +145,11 @@ const handleReset = () => {
         <!-- <pre>{{ usersListStore }}</pre> -->
         <Toast position="bottom-right" group="br" />
         <div class="d-flex mr-2">
-            <h5 class="mb-1">Reports</h5>
+            <h5 class="mb-1">Reports 
+                <span v-tooltip.right="{ value: 'If you are running the backend in local, use--- ```php artisan storage:link``` for the first time.' }" class="pi pi-info-circle cursor-pointer text-red-500 text-lg instruction-tip"></span>
+            </h5>
             <!-- <pre>
-                sp =>{{  selectedProject?.length }}
+                sp =>{{  selectedStatus?.length }}
             
             </pre> -->
         </div>
@@ -167,9 +157,9 @@ const handleReset = () => {
             <template #start>
                 <div class="flex gap-2 flex-wrap">
                     <div class="user-selection w-full md:w-14rem w-full">
-                        <label class="font-bold block mb-2">Option:</label>
+                        <label class="font-bold block mb-2">Booking Status:</label>
                         <div class="flex justify-content-center">
-                            <MultiSelect display="chip" v-model="selectedProject"  filter resetFilterOnHide optionLabel="name" placeholder="Select Option" class="w-full" />
+                            <Dropdown display="chip" v-model="selectedStatus" :options="statusList" filter resetFilterOnHide optionLabel="name" placeholder="Select Status (Optional)" class="w-full" />
                         </div>
                     </div>
                     <div class="flex-auto">
@@ -185,7 +175,7 @@ const handleReset = () => {
 
             <template #end>
                 <Button @click="handleReset" label='Reset' class="mr-2" />
-                <Button @click="handleGenerate" class="" label="Generate" :loading="loading" />
+                <Button @click="handleReportDownload" class="" label="Generate" :loading="loading" />
             </template>
         </Toolbar>
     </div>

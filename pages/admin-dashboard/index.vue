@@ -124,17 +124,13 @@ watch(
 <template>
     <div v-if="isAdmin" class="grid">
         <div class="col-12 lg:col-6 xl:col-3">
-            <div class="card mb-0">
-                <div class="flex justify-content-between mb-3">
-                    <div>
-                        <span class="block text-500 font-medium mb-3">Total Bookings</span>
-                        <div class="text-900 font-medium text-xl">152</div>
-                    </div>
-                    <div class="flex align-items-center justify-content-center bg-blue-100 border-round" style="width: 2.5rem; height: 2.5rem">
-                    </div>
+            <div class="card mb-0" :style="`border-left:6px solid #abdbe3;`">
+                <div  class="flex justify-content-between">
+                    <h4 class="mb-0 block text-xl font-semibold tracking-tight">Total Tasks</h4>
+                    <div class="text-900 font-bold text-2xl">{{ totalTaskCount }}</div>
                 </div>
-              
             </div>
+
         </div>
         <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">

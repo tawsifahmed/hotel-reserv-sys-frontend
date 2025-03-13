@@ -1,26 +1,22 @@
 <script setup>
 import accessPermission from '~/composables/userTypeChecker';
+import { FilterMatchMode } from 'primevue/api';
 
+import Column from 'primevue/column';
+
+import DataTable from 'primevue/datatable';
 const url = useRuntimeConfig();
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
 });
 
+const toast = useToast();
+
 const isAdmin = ref(accessPermission('admin'));
-
-import { FilterMatchMode } from 'primevue/api';
-
-import Column from 'primevue/column';
-
-import DataTable from 'primevue/datatable';
-
 const filters = ref();
-
 const loading = ref(true);
 const loading1 = ref(false);
-
-const toast = useToast();
 
 const visibleCreateTag = ref(false);
 
@@ -56,7 +52,7 @@ const handleCreateTagModal = () => {
 };
 
 const editTag = (data) => {
-    visibleEditTag.value = true;
+    visibleDeleteTag.value = true;
     id.value = data.id;
     name.value = data.name;
     email.value = data.email;
@@ -64,28 +60,49 @@ const editTag = (data) => {
     address.value = data.address;
 };
 
-const deleteTag = (key) => {
-    visibleDeleteTag.value = true;
+const actionType = ref(null)
+const actionModalMsg = ref(null)
+const actionOnRsrv = (key, type) => {
     id.value = key;
+    if(type === 'hold'){
+        actionType.value = 'pending'
+        actionModalMsg.value = type
+    }
+    
+    if(type === 'approve'){
+        actionType.value = 'confirmed'
+        actionModalMsg.value = type
+    }
+    
+    if(type === 'cancel'){
+        actionType.value = 'cancelled'
+        actionModalMsg.value = type
+    }
+    
+    visibleDeleteTag.value = true;
 };
 
 const confirmDeleteTag = async () => {
     loading1.value = true;
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`${url.public.apiUrl}/tag/delete/${id.value}`, {
-        method: 'DELETE',
+    const { data, pending } = await useFetch(`${url.public.apiUrl}/api/v1/reservations/update/${id.value}`, {
+        method: 'POST',
         headers: {
             Authorization: `Bearer ${token.value}`
+        },
+        body: {
+        status: actionType.value,
         }
     });
 
     if (data.value.code === 200) {
         visibleDeleteTag.value = false;
-        toast.add({ severity: 'success', summary: 'Success', detail: 'Tag Deleted successfully!', group: 'br', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Success', detail: `Reservation status is ${actionType.value}!`, group: 'br', life: 3000 });
         loading1.value = false;
+       
         init();
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Tag Deleted Failed!', group: 'br', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to change reservation status!', group: 'br', life: 3000 });
         loading1.value = false;
     }
 };
@@ -142,7 +159,7 @@ initFilters();
             </template>
         </Toolbar>
 
-        <DataTable v-model:filters="filters" class="table-st" :value="reservationsList" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-st" :value="reservationsList" stripedRows paginator tableStyle="min-width: 50rem" :rows="30" :rowsPerPageOptions="[5, 10, 20, 30, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
@@ -153,6 +170,7 @@ initFilters();
             <Column field="start_date" header="Check In"></Column>
             <Column field="end_date" header="Check Out"></Column>
             <Column field="room.price_per_night" header="Price"></Column>
+            <Column field="user.name" header="Booked By"></Column>
             <Column field="status" header="Status">
                 <template #body="slotProps">
                     <span :class="{
@@ -165,9 +183,9 @@ initFilters();
             </Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">
-                    <Button icon="pi pi-check" text class="" severity="success" rounded @click="editTag(slotProps.data)" />
-                    <Button icon="pi pi-undo" text class="" severity="secondary" rounded @click="editTag(slotProps.data)" />
-                    <Button v-tooltip.top="{ value: 'Cancel reservation' }" icon="pi pi-times" text severity="danger" rounded @click="deleteFloor(slotProps.data.id)"/>
+                    <Button :disabled="slotProps.data.status === 'confirmed'" v-tooltip.top="{ value: 'Approve reservation' }" icon="pi pi-check" text class="" severity="success" rounded @click="actionOnRsrv(slotProps.data.id, 'approve')" />
+                    <Button :disabled="slotProps.data.status === 'pending'"  v-tooltip.top="{ value: 'Hold reservation' }" icon="pi pi-undo" text class="" severity="secondary" rounded @click="actionOnRsrv(slotProps.data.id, 'hold')" />
+                    <Button :disabled="slotProps.data.status === 'cancelled'" v-tooltip.top="{ value: 'Cancel reservation' }" icon="pi pi-times" text severity="danger" rounded @click="actionOnRsrv(slotProps.data.id, 'cancel')"/>
 
                 </template>
             </Column>
@@ -185,7 +203,7 @@ initFilters();
         </Dialog>
 
         <Dialog v-model:visible="visibleDeleteTag" header=" " dismissableMask="true" :style="{ width: '25rem' }">
-            <p>Are you sure you want to delete?</p>
+            <p>Are you sure you want to <span> <b>{{actionModalMsg}}</b> </span> this reservation?</p>
             <Button label="No" icon="pi pi-times" text @click="visibleDeleteTag = false" />
             <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteTag" :loading="loading1" />
         </Dialog>

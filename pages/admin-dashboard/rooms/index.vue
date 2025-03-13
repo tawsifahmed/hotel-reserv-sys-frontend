@@ -103,7 +103,21 @@ const init = async () => {
         })
     );
     if (data.value?.length > 0) {
-        roomsList.value = data.value?.map((item, index) => ({ ...item, index: index + 1 }));
+        const uniqueRooms = [];
+        const roomMap = new Map();
+
+        data.value.forEach((item, index) => {
+            const key = `${item.name}-${item.floor.name}-${item.seats}-${item.price_per_night}`;
+            if (!roomMap.has(key)) {
+            roomMap.set(key, { ...item, index: index + 1 });
+            }
+        });
+
+        roomMap.forEach((value) => {
+            uniqueRooms.push(value);
+        });
+
+        roomsList.value = uniqueRooms;
     }
 };
 
