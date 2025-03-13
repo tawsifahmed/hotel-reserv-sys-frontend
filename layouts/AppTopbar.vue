@@ -1,8 +1,20 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+
+import { storeToRefs } from 'pinia'; 
+import { useUserStore } from '~/store/user';
+import { useAuthStore } from '~/store/auth'; 
 import { useLayout } from './composables/layout';
 import { useRouter } from 'vue-router';
 import accessPermission from '~/composables/userTypeChecker';
+const url = useRuntimeConfig();
+
+
+const { logUserOut } = useAuthStore(); 
+const { getUserData } = useUserStore();
+
+const { userProfile } = storeToRefs(useUserStore());
+const { authenticated } = storeToRefs(useAuthStore()); 
 
 const isAdmin = ref(accessPermission('admin'));
 
@@ -10,19 +22,14 @@ const { layoutConfig, onMenuToggle } = useLayout();
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
-import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
-import { useAuthStore } from '~/store/auth'; // import the auth store we just created
-// // import { useRoute } from 'vue-router';
+const visibleProfile = ref(false);
 // console.log('path', useRoute().path);
 
-const { logUserOut } = useAuthStore(); // use authenticateUser action from  auth store
-const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
-
-const logout = () => {
-    logUserOut();
-    router.push('/login');
-    // location.reload();
+const openProfile = () => {
+    visibleProfile.value = !visibleProfile.value;
 };
+
+
 
 onMounted(() => {
     bindOutsideClickListener();
@@ -101,6 +108,14 @@ onMounted(() => {
         }
     }
 });
+
+getUserData();
+
+const logout = () => {
+    logUserOut();
+    router.push('/login');
+    // location.reload();
+};
 </script>
 
 <template>
@@ -135,7 +150,7 @@ onMounted(() => {
                 <span>My Bookings</span>
             </NuxtLink>
 
-            <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
+            <button @click="openProfile()" class="p-link layout-topbar-button">
                 <i class="pi pi-user"></i>
                 <span>Profile</span>
             </button>
@@ -144,6 +159,9 @@ onMounted(() => {
                 <span>Sign Out</span>
             </button>
         </div>
+        <Dialog v-model:visible="visibleProfile" modal header="Profile" dismissableMask="true" :style="{ width: '65rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <Profile :userProfile="userProfile" />
+        </Dialog>
     </div>
 </template>
 

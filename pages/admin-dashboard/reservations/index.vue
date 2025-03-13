@@ -92,8 +92,8 @@ const confirmDeleteTag = async () => {
 
 const init = async () => {
     const token = useCookie('token');
-    const { data, pending, error } = await useAsyncData('tagsList', () =>
-        $fetch(`${url.public.apiUrl}/tag/list`, {
+    const { data, pending, error } = await useAsyncData('reservationList', () =>
+        $fetch(`${url.public.apiUrl}/reservations`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
