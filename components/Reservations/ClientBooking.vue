@@ -39,7 +39,10 @@ const handleSubmitData = async () => {
                 employeeForm.value = false;
                 loading.value = false;
                 emit('closeCreateModal', false);
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Booking created successfully!', group: 'br', life: 3000 });
+                await toast.add({ severity: 'success', summary: 'Success', detail: 'Booking created successfully!', group: 'br', life: 3000 });
+                setTimeout(() => {
+                    navigateTo({ path: `/my-bookings/` });
+                }, 2000);
             } else {
                 loading.value = false;
                 toast.add({ severity: 'error', summary: 'Error', detail: 'Booking creation failed!', group: 'br', life: 3000 });

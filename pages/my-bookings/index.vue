@@ -8,6 +8,7 @@ definePageMeta({
     layout: 'false'
 });
 
+const toast = useToast();
 const myBookingList = ref([]);
 const init = async () => {
     const token = useCookie('token');

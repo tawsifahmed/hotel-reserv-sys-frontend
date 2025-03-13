@@ -124,11 +124,11 @@ onMounted(() => {
                     <div class="flex gap-2">
                         <div class="flex-auto">
                             <label for="icondisplay" class="font-bold block mb-2 dash-labels">Check In: </label>
-                            <Calendar v-model="startDate" @date-select="handleChange('startDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" placeholder="From" />
+                            <Calendar v-model="startDate" showIcon iconDisplay="input" inputId="icondisplay" placeholder="From" />
                         </div>
                         <div class="flex-auto">
                             <label for="icondisplay" class="font-bold block mb-2 dash-labels"> Check Out: </label>
-                            <Calendar v-model="endDate" @date-select="handleChange('endtDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" placeholder="To" />
+                            <Calendar v-model="endDate" showIcon iconDisplay="input" inputId="icondisplay" placeholder="To" />
                         </div>
                         <div class="flex-auto">
                             <label for="icondisplay" class="font-bold block mb-2 dash-labels">Floor: (Optional) </label>
