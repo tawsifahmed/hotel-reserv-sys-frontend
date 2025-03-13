@@ -9,16 +9,17 @@ const props = defineProps({
 });
 const floorList = ref(props.param.floorList);
 
-const roomNo = ref('');
+const roomNo = ref(null);
 const selectedFloor = ref([]);
 const seatNo = ref(1);
 const roomPrice = ref();
 const errorHandler = ref(false);
 
 const emit = defineEmits(['closeCreateModal']);
-
+const loading = ref(false);
 const handleSubmitData = async () => {
-    if (roomNo.value === '' || selectedFloor.value === '' || seatNo.value === '' || roomPrice.value === '') {
+    loading.value = true;
+    if (!roomNo.value || selectedFloor.value === '' || seatNo.value === '' || roomPrice.value === '') {
         errorHandler.value = true;
         return;
     } else {
@@ -31,7 +32,7 @@ const handleSubmitData = async () => {
                     Authorization: `Bearer ${token.value}`
                 },
                 body: {
-                    name: roomNo.value,
+                    name: roomNo.value.toString(),
                     floor_id: selectedFloor.value.id,
                     seats: seatNo.value,
                     price_per_night: roomPrice.value
@@ -65,10 +66,10 @@ onMounted(() => {
 
 <template>
     <div>
-        <div class="field">
+        <div class="field flex flex-column">
             <!-- {{ selectedFloor }} -->
             <label>Room No.<i class="text-red-400 text-italic">*</i> </label>
-            <InputText id="createFloorName" v-model="roomNo" class="w-full" placeholder="Enter room number" />
+            <InputNumber v-model="roomNo" :min="1"  inputId="withoutgrouping" :useGrouping="false" />
         </div>
         <div class="field flex flex-column">
             <label>Floor Layout<i class="text-red-500">* 
@@ -96,7 +97,7 @@ onMounted(() => {
 
         <p v-if="errorHandler" style="color: red">Please enter floor name</p>
         <div class="create-btn-wrapper mb-0">
-            <Button label="Save" icon="pi pi-check" text="" @click="handleSubmitData" />
+            <Button label="Save" icon="pi pi-check" text="" @click="handleSubmitData" :loading="loading" />
         </div>
     </div>
 </template>

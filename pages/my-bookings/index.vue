@@ -1,9 +1,7 @@
 <script setup>
-
 import AppTopbar from '../../layouts/AppTopbar.vue';
 import AppFooter from '../../layouts/AppFooter.vue';
 const url = useRuntimeConfig();
-
 
 definePageMeta({
     middleware: 'auth',
@@ -11,47 +9,105 @@ definePageMeta({
 });
 
 const myBookingList = ref([]);
-onMounted(() => {
+const init = async () => {
+    const token = useCookie('token');
+    const { data, pending, error } = await useAsyncData('userBookingList', () =>
+        $fetch(`${url.public.apiUrl}/api/v1/users/reservations`, {
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        })
+    );
+    if (data.value?.length > 0) {
+        myBookingList.value = data.value?.map((item, index) => ({ ...item, index: index + 1 }));
+    }
+};
+const id = ref(null);
+const visibleDeleteFloor = ref(false);
+const deleteFloor = (key) => {
+    visibleDeleteFloor.value = true;
+    id.value = key;
+};
 
+const loading1 = ref(false);
+
+const confirmDeleteFloor = async () => {
+    loading1.value = true;
+    const token = useCookie('token');
+    const { data, pending } = await useFetch(`${url.public.apiUrl}/api/v1/reservations/update/${id.value}`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        },
+        body: {
+        status: 'cancelled',
+        }
+    });
+
+    if (data.value.code === 200) {
+        visibleDeleteFloor.value = false;
+        toast.add({ severity: 'success', summary: 'Success', detail: 'Floor deleted successfully!', group: 'br', life: 3000 });
+        loading1.value = false;
+       
+        init();
+    } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Floor deleted Failed!', group: 'br', life: 3000 });
+        loading1.value = false;
+    }
+};
+
+const tableLoader = ref(true);
+onMounted(async () => {
+    await init();
+    tableLoader.value = false;
 });
 </script>
 
 <template>
     <div class="main-wrapper">
         <AppTopbar />
-        <div class="card dash-banner">
+        <div class="card dash-banner" style="width: 85%; margin: 0 auto; margin-top: 100px">
             <div class="d-flex mr-2">
                 <h5 class="mb-1">My Bookings</h5>
             </div>
             <Toolbar class="border-0 px-0">
-                <template #start>
-                    <Button icon="pi pi-plus" label="Create" class="mr-2" severity="secondary" />
-                    <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
-                    <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" />
-                    <Button icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" /> -->
-                </template>
-
+                <template #start> </template>
             </Toolbar>
-    
-            <DataTable class="table-st" :value="myBookingList" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
+
+            <DataTable class="table-st" :value="myBookingList" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="tableLoader">
                 <template #empty> <p class="text-center">No Data found...</p> </template>
                 <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
                 <Column field="index" header="Serial" sortable></Column>
-    
-                <Column field="name" header="Room Name"></Column>
-                <Column field="name" header="Check In"></Column>
-                <Column field="name" header="Check Out"></Column>
+
+                <Column field="room.name" header="Room No."></Column>
+                <Column field="room.seats" header="Seats"></Column>
+                <Column field="room.floor.name" header="Floor Layout"></Column>
+                <Column field="start_date" header="Check In"></Column>
+                <Column field="end_date" header="Check Out"></Column>
+                <Column field="room.price_per_night" header="Price"></Column>
+                <Column field="status" header="Status">
+                    <template #body="slotProps">
+                        <span :class="{
+                            'bg-red-100 text-red-800': slotProps.data.status === 'cancelled',
+                            'bg-green-100 text-green-800': slotProps.data.status === 'confirmed',
+                            'bg-yellow-100 text-yellow-800': slotProps.data.status === 'pending'
+                        }" class="px-2 py-1 rounded" style="border-radius: 5px;">{{slotProps.data.status}}
+                    </span>
+                    </template>
+                </Column>
                 <!-- <Column field="email" sortable header="Email Address"></Column> -->
                 <!-- <Column field="phone" sortable header="Phone Number"></Column> -->
                 <Column field="action" header="Action">
                     <template #body="slotProps">
-                        <Button icon="pi pi-pencil" text class="" severity="success" rounded  />
-                        <Button icon="pi pi-pencil" text class="" severity="success" rounded style="visibility: hidden" />
-                        <Button icon="pi pi-trash" text class="" severity="warning" rounded />
-                        <Button icon="pi pi-trash" text class="" severity="warning" rounded style="visibility: hidden" />
+                        <Button :disabled="slotProps.data.status === 'cancelled'" v-tooltip.top="{ value: 'Cancel reservation' }" icon="pi pi-times" text severity="danger" rounded @click="deleteFloor(slotProps.data.id)"/>
                     </template>
-                </Column>            </DataTable>
-
+                </Column>
+            </DataTable>
+            <Dialog v-model:visible="visibleDeleteFloor" header="Cancel Booking" dismissableMask="true" :style="{ width: '25rem' }">
+                <p>Are you sure you want to cancel ?</p>
+                <Button label="No" icon="pi pi-times" text @click="visibleDeleteFloor = false" />
+                <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteFloor" :loading="loading1" />
+            </Dialog>
             <Toast position="bottom-right" group="br" />
         </div>
         <AppFooter />
@@ -59,23 +115,20 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
-
 .main-wrapper {
     display: flex;
     flex-direction: column;
-    min-height: 100vh; 
+    min-height: 100vh;
 }
 
-.dash-banner{
+.dash-banner {
     margin-top: 70px; /* Give space between navbar and banner */
     display: flex;
     flex-direction: column;
     flex-grow: 1; /* Ensure the .dash div takes up all available space */
     overflow-y: auto; /* Allows scrolling when content exceeds height */
-    max-height: calc(100vh - 370px); /* Ensure the dash doesn't exceed available height */
     padding: 20px;
 }
-
 
 .table-st {
     border: 1px solid #ededed;

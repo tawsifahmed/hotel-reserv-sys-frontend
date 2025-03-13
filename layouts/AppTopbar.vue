@@ -7,6 +7,8 @@ import { useAuthStore } from '~/store/auth';
 import { useLayout } from './composables/layout';
 import { useRouter } from 'vue-router';
 import accessPermission from '~/composables/userTypeChecker';
+import Notification from '../components/Notification.vue';
+
 const url = useRuntimeConfig();
 
 
@@ -109,6 +111,12 @@ onMounted(() => {
     }
 });
 
+const isMyBookingsRoute = ref(false);
+
+onMounted(() => {
+    isMyBookingsRoute.value = router.currentRoute.value.path === '/my-bookings';
+});
+
 getUserData();
 
 const logout = () => {
@@ -137,16 +145,16 @@ const logout = () => {
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
             <div>
                 <NuxtLink v-if="showAdminRoute === true" to="/" class="p-link layout-topbar-button mr-5 modified-link">
-                    <h5 class="text-nowrap mb-0">Client Site</h5>
+                    <h5 class="text-nowrap mb-0 m-links">Client Site</h5>
                     <span>Client Site</span>
                 </NuxtLink>
-                <NuxtLink v-if="showClientRoute === true" to="/admin-dashboard" class="p-link layout-topbar-button mr-5 modified-link">
-                    <h5 class="text-nowrap mb-0">Dashboard</h5>
-                    <span>Dashboard</span>
+                <NuxtLink v-if="showClientRoute === true" to="/admin-dashboard" class="p-link layout-topbar-button mr-5 modified-link" style="margin-right: 95px !important;">
+                    <h5 class="text-nowrap mb-0 m-links">Admin Dashboard</h5>
+                    <span>Admin Dashboard</span>
                 </NuxtLink>
             </div>
             <NuxtLink v-if="isClient === true" to="/my-bookings" class="p-link layout-topbar-button mr-5 modified-link">
-                <h5 class="text-nowrap mb-0">My Bookings</h5>
+                <h5 class="text-nowrap mb-0" :class="isMyBookingsRoute === true ? 'font-bold underline' : ''">My Bookings</h5>
                 <span>My Bookings</span>
             </NuxtLink>
 
@@ -172,6 +180,12 @@ const logout = () => {
 }
 
 .modified-link {
-    margin-right: 65px !important;
+    margin-right: 40px !important;
 }
+
+.modified-link:hover {
+    background: none !important;
+}
+
+
 </style>

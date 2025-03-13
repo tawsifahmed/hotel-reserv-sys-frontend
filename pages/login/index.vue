@@ -229,8 +229,6 @@ onMounted(() => {
 <template>
     <div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
         <div class="flex flex-column align-items-center justify-content-center">
-            <!-- <img :src="logoUrl" alt="Sakai logo" class="mb-5 w-6rem flex-shrink-0" /> -->
-            <!-- <h2 class="font-bold">Pera App</h2> -->
             <Toast position="bottom-right" group="br" />
             <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
                 <div v-if="loginForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
@@ -255,17 +253,13 @@ onMounted(() => {
                                 <Checkbox inputId="rememberme1" v-model="user.remember" binary class="mr-2"></Checkbox>
                                 <label for="rememberme1">Remember me</label>
                             </div>
-                            <a @click="handleReset" class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)">Forgot password?</a>
+                            <!-- <a @click="handleReset" class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)">Forgot password?</a> -->
                         </div>
                         <Button type="submit" label="Sign In" :loading="loginBtnHandle" class="w-full p-3 text-xl" />
                     </form>
-                    <div class="w-full mt-4">
-                        <!-- <GoogleSignInButton size="large" width="500" class="" @success="handleLoginSuccess" @error="handleLoginError"></GoogleSignInButton> -->
-                        <GoogleLogin></GoogleLogin>
-                    </div>
+                    
                     <div class="flex flex-wrap items-center justify-between mt-4">
                         Don't have an account?&nbsp; <NuxtLink to="/register" class="forgot_pass md:mb-0"> Click Here.</NuxtLink>
-                        <!-- <nuxt-link to="/" class="forgot_pass">Forgot password?</nuxt-link> -->
                     </div>
                 </div>
                 <div v-if="resetForm == 'email'" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">

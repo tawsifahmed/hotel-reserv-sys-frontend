@@ -26,7 +26,7 @@ const emit = defineEmits(['closeEditModal']);
 
 const handleSubmitData = async () => {
     loading.value = true;
-    if (roomNo.value === '' || selectedFloor.value === '' || seatNo.value === '' || roomPrice.value === '') {
+    if (!roomNo.value || selectedFloor.value === '' || seatNo.value === '' || roomPrice.value === '') {
         errorHandler.value = true;
         loading.value = false;
         return;
@@ -40,7 +40,7 @@ const handleSubmitData = async () => {
                     Authorization: `Bearer ${token.value}`
                 },
                 body: {
-                    name: roomNo.value,
+                    name: roomNo.value.toString(),
                     floor_id: selectedFloor.value.id,
                     seats: seatNo.value,
                     price_per_night: roomPrice.value
@@ -74,9 +74,9 @@ onMounted(() => {
     <div>
         <!-- {{ roomPrice }} -->
         <!-- {{seatNo}} -->
-        <div class="field">
+        <div class="field flex flex-column">
             <label>Room No.<i class="text-red-400 text-italic">*</i> </label>
-            <InputText id="createFloorName" v-model="roomNo" class="w-full" placeholder="Enter room number" />
+            <InputNumber v-model="roomNo" :min="1"  inputId="withoutgrouping" :useGrouping="false" />
         </div>
         <div class="field flex flex-column">
             <label>Floor Layout<i class="text-red-500">*</i></label>

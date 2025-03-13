@@ -130,12 +130,14 @@ const initFilters = () => {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS }
     };
 };
+const tableLoader = ref(true);
 
-onMounted(() => {
-    init();
+onMounted(async() => {
     if (isAdmin.value === false) {
         throw createError({ statusCode: 404, message: 'Access denied!', fatal: true });
     }
+    await init();
+    tableLoader.value = false;
     loading.value = false;
 });
 initFilters();
@@ -165,7 +167,7 @@ initFilters();
             </template>
         </Toolbar>
 
-        <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows paginator :rowsPerPageOptions="[5, 10, 20, 50]" tableStyle="min-width: 50rem" :rows="20" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows paginator :rowsPerPageOptions="[5, 10, 20, 50]" tableStyle="min-width: 50rem" :rows="20" dataKey="id" filterDisplay="menu" :loading="tableLoader">
             <!-- <DataTable 
             v-model:filters="filters" 
             class="table-st" 

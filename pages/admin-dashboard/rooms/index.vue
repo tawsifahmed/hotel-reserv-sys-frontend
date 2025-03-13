@@ -74,20 +74,21 @@ const deleteRoom = (key) => {
 const confirmDeleteRoom = async () => {
     loading1.value = true;
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`${url.public.apiUrl}/rooms/delete/${roomId.value}`, {
+    const { data, pending } = await useFetch(`${url.public.apiUrl}/api/v1/rooms/delete/${roomId.value}`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token.value}`
         }
     });
+    
 
     if (data.value.code === 200) {
         visibleDeleteRoom.value = false;
-        toast.add({ severity: 'success', summary: 'Success', detail: 'Tag Deleted successfully!', group: 'br', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Success', detail: 'Room deleted successfully!', group: 'br', life: 3000 });
         loading1.value = false;
         init();
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Tag Deleted Failed!', group: 'br', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete!', group: 'br', life: 3000 });
         loading1.value = false;
     }
 };
@@ -111,11 +112,13 @@ const initFilters = () => {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS }
     };
 };
-onMounted(() => {
-    init();
+const tableLoader = ref(true);
+onMounted(async() => {
     if (isAdmin.value === false) {
         throw createError({ statusCode: 404, message: 'Access denied!', fatal: true });
     }
+    await init();
+    tableLoader.value = false;
     loading.value = false;
     getFloors();
 });
@@ -144,7 +147,7 @@ initFilters();
         </Toolbar>
         <!-- <pre>        {{roomsList}}
         </pre> -->
-        <DataTable v-model:filters="filters" class="table-st" :value="roomsList" stripedRows paginator tableStyle="min-width: 50rem" :rows="20" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-st" :value="roomsList" stripedRows paginator tableStyle="min-width: 50rem" :rows="20" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="tableLoader">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>

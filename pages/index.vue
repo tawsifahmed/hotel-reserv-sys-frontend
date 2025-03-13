@@ -96,6 +96,13 @@ const showBookingDialog = (roomInfo) => {
 };
 
 getFloors();
+
+const closeCreateModal = (evn) => {
+    visibleBookingDialog.value = false;
+    getRooms();
+};
+
+
 onMounted(() => {
     console.log('Mounted', url);
 });

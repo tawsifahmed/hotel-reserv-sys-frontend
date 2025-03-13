@@ -29,3 +29,9 @@ $gutter: 1rem; //for primeflex grid system
 }
 
 
+.p-component-overlay {
+    backdrop-filter: blur(90px);
+    background: transparent;
+}
+
+

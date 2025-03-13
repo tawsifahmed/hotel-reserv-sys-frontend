@@ -2,7 +2,9 @@
 import { useFloorStore } from '~/store/floors';
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import accessPermission from '~/composables/userTypeChecker';
-
+import { FilterMatchMode } from 'primevue/api';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable'
 const { getFloors } = useFloorStore();
 const { floorList, floorsLength } = storeToRefs(useFloorStore());
 
@@ -12,14 +14,13 @@ definePageMeta({
     layout: 'default'
 });
 
+const floorListwithIndex = computed(() => {
+    return floorList.value.map((item, index) => {
+        return { ...item, index: index + 1 };
+    });
+});
+
 const isAdmin = ref(accessPermission('admin'));
-
-import { FilterMatchMode } from 'primevue/api';
-
-import Column from 'primevue/column';
-
-import DataTable from 'primevue/datatable';
-
 const filters = ref();
 
 const loading = ref(true);
@@ -134,7 +135,7 @@ initFilters();
             </template>
         </Toolbar>
 
-        <DataTable v-model:filters="filters" class="table-st" :value="floorList" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-st" :value="floorListwithIndex" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
