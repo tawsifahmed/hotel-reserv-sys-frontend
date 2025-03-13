@@ -6,11 +6,15 @@ const page = ref(1);
 const totalPage = ref(1);
 const emit = defineEmits(['closeNotification']);
 const toast = useToast();
+import accessPermission from '~/composables/userTypeChecker';
+
+const isAdmin = ref(accessPermission('admin'));
 
 
 const handleClick = async (element) => {
+    console.log('element =>', element.reservation_id);
     try {
-        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/notification/update/${element.id}`, {
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/api/v1/notifications/update/${element.id}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -19,11 +23,12 @@ const handleClick = async (element) => {
                 is_read: 1
             }
         });
-        // console.log('Notification_element =>', element);
-        if (element.payload?.type === "task_details"){
-            await navigateTo({ path: `/companies/${companyId}/spaces/${element?.space_id}/projects/${element?.project_id}`, query: { task_key: element?.task_id } });
-            emit('closeNotification', false);
-        } 
+        // return
+        if (isAdmin.value === true){
+            await navigateTo({ path: `/admin-dashboard/reservations/`, query: { booking_key: element.reservation_id } });
+        } else {
+            await navigateTo({ path: `/my-bookings/`, query: { booking_key: element.reservation_id } });
+        }
         await fetchData();
     } catch (e) {
         console.log(e);
@@ -32,7 +37,7 @@ const handleClick = async (element) => {
 
 const fetchData = async () => {
     try {
-        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/notification/list?limit=5&page=${page.value}`, {
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/api/v1/notifications?limit=5&page=${page.value}`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -59,7 +64,7 @@ const loadingRead = ref(false);
 const handleReadAll = async () => {
     loadingRead.value = true;
     try {
-        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/notification/read-all`, {
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/api/v1/notifications/read-all`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -91,13 +96,21 @@ const handleNavigate = async (type) => {
     }
     await fetchData();
 };
+
+const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', options);
+};
 </script>
 <template>
-    <div  class="card card1">
-        <h5 class="mb-1">Notifications</h5>
+    <div  class="bg-white card1">
         <!-- <pre>{{ notificationData }}</pre> -->
         <div v-if="notificationData.length > 0" v-for="notify in notificationData" :key="notify" class="">
-            <div @click="handleClick(notify)" v-html="notify.title" :class="`notifyTitle ${notify.is_read === 0 ? 'unread' : ''}`"></div>
+            <div @click="handleClick(notify)" :class="`notifyTitle ${notify.is_read === 0 ? 'unread' : ''}`">
+                <p>{{notify.text}} at {{formatDate(notify.created_at)}}</p>
+                
+            </div>
         </div>
         <div class="bg-white text-center text-lg" v-else>
             No notifications!
@@ -108,7 +121,7 @@ const handleNavigate = async (type) => {
                 <Button @click="handleNavigate('prev')" :disabled="page === 1 ? true : false" icon="pi pi-chevron-left" outlined aria-label="Filter" />
                 <Button @click="handleNavigate('')" :disabled="totalPage === page || !notificationData.length > 0 ? true : false" icon="pi pi-chevron-right" outlined aria-label="Filter" />
             </div>
-            <Button class="hover:bg-gray-200" label="Read All" @click="handleReadAll" :loading="loadingRead"/>
+            <Button class="bg-white hover:bg-gray-200  text-indigo-500 hover:text-indigo-600" label="Read All" @click="handleReadAll" :loading="loadingRead"/>
         </div>
     </div>
     

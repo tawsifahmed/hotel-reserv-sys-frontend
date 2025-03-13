@@ -162,7 +162,7 @@ onMounted(() => {
                             <div class="seats-info">
                                 <b>Total Seats: {{ room?.seats }}</b>
 
-                                <h5 class="m-0 mb-1 mt-1">
+                                <h5 class="m-0 mb-1">
                                     <b class="price-info"> Price: ${{ room?.price_per_night }} </b>
                                 </h5>
 
@@ -171,7 +171,7 @@ onMounted(() => {
                                     <br />
                                     <i class="">{{ room.floor?.name }}</i>
                                 </h6>
-                                <Button @click="showBookingDialog(room)" label="Book" severity="primary" class="ml-4 mt-5" size="large" style="width: 120px" />
+                                <Button @click="showBookingDialog(room)" label="Book" severity="primary" class="ml-4 mt-5" size="large" style="width: 120px; position: absolute; top: 90px;" />
                             </div>
                         </div>
                     </div>

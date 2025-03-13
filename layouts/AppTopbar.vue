@@ -31,9 +31,81 @@ const openProfile = () => {
     visibleProfile.value = !visibleProfile.value;
 };
 
+const showNotify = ref(false);
+
+const handleOutsideClick = () => {
+    if (showNotify.value) {
+        // fetchNotifyData();
+        showNotify.value = false;
+        notifiData.value = false;
+    }
+};
+
+const closeNotification = (evn) => {
+    showNotify.value = evn;
+    // fetchNotifyData();
+    // notifiData.value = false;
+};
+
+const notifiData = ref(false);
+const fetchNotifyData = async () => {
+    const token = useCookie('token');
+    try {
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/api/v1/notifications?limit=5&page=1`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        });
+
+        if (data.value) {
+            if (data.value.data.find((item) => item.is_read === 0)) {
+                notifiData.value = true;
+            } else {
+                notifiData.value = false;
+            }
+            // totalPage.value = Math.ceil(data.value.total / 5);
+        }
+    } catch (e) {
+        console.log(e);
+    }
+};
+
+fetchNotifyData();
+
+const handleNotificationComp = () => {
+    showNotify.value = !showNotify.value;
+    if (notifiData.value) {
+        notifiData.value = false;
+    }
+};
+
+const vClickOutside = {
+    beforeMount(el, binding) {
+        el.clickOutsideEvent = (event) => {
+            if (!(el == event.target || el.contains(event.target))) {
+                binding.value(event);
+            }
+        };
+        document?.body.addEventListener('click', el.clickOutsideEvent);
+    },
+    unmounted(el) {
+        document?.body?.removeEventListener('click', el.clickOutsideEvent);
+    }
+};
+
+// Add directive to DOM element
+
+onUnmounted(() => {
+    const element = document.querySelector('.relative');
+    vClickOutside?.unmounted(element);
+});
+
 
 
 onMounted(() => {
+    const element = document.querySelector('.relative');
+    vClickOutside?.beforeMount(element, { value: handleOutsideClick });
     bindOutsideClickListener();
 });
 onBeforeUnmount(() => {
@@ -134,15 +206,28 @@ const logout = () => {
             <h5 class="m-0" style="text-wrap: nowrap">Hotel Reservation System</h5>
         </router-link>
 
-        <button v-if="!isClient" class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
+        <!-- <button v-if="!isClient" class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
             <i class="pi pi-bars"></i>
-        </button>
+        </button> -->
 
         <button class="p-link layout-topbar-menu-button layout-topbar-button" @click="onTopBarMenuButton()">
             <i class="pi pi-ellipsis-v"></i>
         </button>
+        <div class="p-link layout-topbar-menu-button layout-topbar-button">
+            <button class="nav-btn" @click="handleNotificationComp">
+                <div v-if="showNotify" class="notification">
+                    <Notification @closeNotification="closeNotification($event)" />
+                </div>
+                <i class="pi pi-bell"></i>
+            </button>
+            <button class="nav-btn" @click="onTopBarMenuButton()">
+                <i class="pi pi-ellipsis-v"></i>
+            </button>
+        </div>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
+           
+
             <div>
                 <NuxtLink v-if="showAdminRoute === true" to="/" class="p-link layout-topbar-button mr-5 modified-link">
                     <h5 class="text-nowrap mb-0 m-links">Client Site</h5>
@@ -157,6 +242,20 @@ const logout = () => {
                 <h5 class="text-nowrap mb-0" :class="isMyBookingsRoute === true ? 'font-bold underline' : ''">My Bookings</h5>
                 <span>My Bookings</span>
             </NuxtLink>
+            <div class="relative">
+                <div v-if="notifiData" class="ping-container">
+                    <span class="ping-outer"></span>
+                    <span class="ping-inner"></span>
+                </div>
+                <button @click="handleNotificationComp" class="p-link layout-topbar-button notify-btn ml-0">
+                    <i class="pi pi-bell"></i>
+                    <span class="ml-4">Notification</span>
+                </button>
+
+                <div v-if="showNotify" class="notification">
+                    <Notification @closeNotification="closeNotification($event)" />
+                </div>
+            </div>
 
             <button @click="openProfile()" class="p-link layout-topbar-button">
                 <i class="pi pi-user"></i>
@@ -187,5 +286,53 @@ const logout = () => {
     background: none !important;
 }
 
+.notify-btn {
+    @media (max-width: 991px) {
+        display: none !important;
+    }
+}
+
+.notification {
+    position: absolute;
+    right: 0;
+    top: 4rem;
+}
+
+.ping-container {
+    position: absolute;
+    display: inline-flex;
+    height: 12px;
+    width: 12px;
+    left: 21px;
+    top: 5px;
+    z-index: 1000;
+}
+
+.ping-outer {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    border-radius: 9999px;
+    background-color: #6366f1;
+    opacity: 0.75;
+    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.ping-inner {
+    position: relative;
+    display: inline-flex;
+    height: 12px;
+    width: 12px;
+    border-radius: 9999px;
+    background-color: #0ea5e9;
+}
+
+@keyframes ping {
+    75%,
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
 
 </style>

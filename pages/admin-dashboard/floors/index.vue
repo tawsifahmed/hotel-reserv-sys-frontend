@@ -101,13 +101,15 @@ const initFilters = () => {
         global: { value: null, matchMode: FilterMatchMode?.CONTAINS }
     };
 };
-
-getFloors();
-onMounted(() => {
-    loading.value = false;
+const tableLoader = ref(true);
+onMounted(async() => {
+    
     if (isAdmin.value === false) {
         throw createError({ statusCode: 404, message: 'Access denied!', fatal: true });
     }
+    await getFloors();
+    tableLoader.value = false;
+    loading.value = false;
 });
 initFilters();
 </script>
@@ -135,7 +137,7 @@ initFilters();
             </template>
         </Toolbar>
 
-        <DataTable v-model:filters="filters" class="table-st" :value="floorListwithIndex" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-st" :value="floorListwithIndex" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="tableLoader">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>

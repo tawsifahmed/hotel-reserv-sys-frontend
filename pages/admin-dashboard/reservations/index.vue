@@ -26,7 +26,7 @@ const visibleCreateTag = ref(false);
 
 const visibleEditTag = ref(false);
 
-const tagsLists = ref([]);
+const reservationsList = ref([]);
 
 const visibleDeleteTag = ref(false);
 
@@ -93,14 +93,14 @@ const confirmDeleteTag = async () => {
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('reservationList', () =>
-        $fetch(`${url.public.apiUrl}/reservations`, {
+        $fetch(`${url.public.apiUrl}/api/v1/reservations`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
         })
     );
-    if (data.value?.data?.length > 0) {
-        tagsLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
+    if (data.value?.length > 0) {
+        reservationsList.value = data.value?.map((item, index) => ({ ...item, index: index + 1 }));
     }
 };
 
@@ -142,23 +142,36 @@ initFilters();
             </template>
         </Toolbar>
 
-        <DataTable v-model:filters="filters" class="table-st" :value="tagsLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-st" :value="reservationsList" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
 
-            <Column field="name" header="Room No"></Column>
-            <Column field="name" header="Booked By"></Column>
-            <Column field="email" sortable header="Check In"></Column>
-            <Column field="phone" sortable header="Check Out"></Column>
-            <Column field="phone" sortable header="Status"></Column>
-            <Column field="action" header="Action">
+            <Column field="room.name" header="Room No."></Column>
+            <Column field="room.seats" header="Seats"></Column>
+            <Column field="room.floor.name" header="Floor Layout"></Column>
+            <Column field="start_date" header="Check In"></Column>
+            <Column field="end_date" header="Check Out"></Column>
+            <Column field="room.price_per_night" header="Price"></Column>
+            <Column field="status" header="Status">
                 <template #body="slotProps">
-                    <Button icon="pi pi-pencil" text class="" severity="success" rounded @click="editTag(slotProps.data)" />
-                    <Button icon="pi pi-pencil" text class="" severity="success" rounded style="visibility: hidden" />
+                    <span :class="{
+                        'bg-red-100 text-red-800': slotProps.data.status === 'cancelled',
+                        'bg-green-100 text-green-800': slotProps.data.status === 'confirmed',
+                        'bg-yellow-100 text-yellow-800': slotProps.data.status === 'pending'
+                    }" class="px-2 py-1 rounded" style="border-radius: 5px;">{{slotProps.data.status}}
+                </span>
                 </template>
             </Column>
-            <!-- <template #footer> In total there are {{ tagsLists ? tagsLists.length : 0 }} rows. </template> -->
+            <Column field="action" header="Action">
+                <template #body="slotProps">
+                    <Button icon="pi pi-check" text class="" severity="success" rounded @click="editTag(slotProps.data)" />
+                    <Button icon="pi pi-undo" text class="" severity="secondary" rounded @click="editTag(slotProps.data)" />
+                    <Button v-tooltip.top="{ value: 'Cancel reservation' }" icon="pi pi-times" text severity="danger" rounded @click="deleteFloor(slotProps.data.id)"/>
+
+                </template>
+            </Column>
+            <!-- <template #footer> In total there are {{ reservationsList ? reservationsList.length : 0 }} rows. </template> -->
         </DataTable>
 
         <!-- Create -->
