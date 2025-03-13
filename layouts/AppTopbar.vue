@@ -18,11 +18,10 @@ import { useAuthStore } from '~/store/auth'; // import the auth store we just cr
 const { logUserOut } = useAuthStore(); // use authenticateUser action from  auth store
 const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
 
-
 const logout = () => {
-  logUserOut();
-  router.push('/login');
-  // location.reload();
+    logUserOut();
+    router.push('/login');
+    // location.reload();
 };
 
 onMounted(() => {
@@ -78,25 +77,38 @@ const isOutsideClicked = (event) => {
 };
 
 const isClient = ref(true);
-
-
-
+const showClientRoute = ref(false);
+const showAdminRoute = ref(false);
 onMounted(() => {
-
-    if (router.currentRoute.value.path === '/' || router.currentRoute.value.path === '/my-bookings' ) {
+    if (router.currentRoute.value.path === '/' || router.currentRoute.value.path === '/my-bookings') {
         isClient.value = true;
     } else {
         isClient.value = false;
+    }
+
+    if (isAdmin.value === true) {
+        if (router.currentRoute.value.path === '/' || router.currentRoute.value.path === '/my-bookings') {
+            showClientRoute.value = true;
+        } else if (
+            router.currentRoute.value.path === '/admin-dashboard' ||
+            router.currentRoute.value.path === '/admin-dashboard/users' ||
+            router.currentRoute.value.path === '/admin-dashboard/floors' ||
+            router.currentRoute.value.path === '/admin-dashboard/rooms' ||
+            router.currentRoute.value.path === '/admin-dashboard/reservations' ||
+            router.currentRoute.value.path === '/admin-dashboard/reports'
+        ) {
+            showAdminRoute.value = true;
+        }
     }
 });
 </script>
 
 <template>
     <div class="layout-topbar">
-        <!-- <pre>{{isClient}}</pre> -->
+        <!-- <pre>{{ isAdmin }}</pre> -->
         <router-link to="/" class="layout-topbar-logo flex justify-content-center align-items-center">
             <img src="/demo/images/login/avatar.png" alt="logo" />
-            <h5 class="m-0" style="text-wrap:nowrap;">Hotel Reservation System</h5>
+            <h5 class="m-0" style="text-wrap: nowrap">Hotel Reservation System</h5>
         </router-link>
 
         <button v-if="!isClient" class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
@@ -108,26 +120,21 @@ onMounted(() => {
         </button>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
-            <!-- <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
-                <i class="pi pi-calendar"></i>
-                <span>Calendar</span>
-            </button> -->
-                <NuxtLink v-if="!isAdmin" to="/my-bookings" class="p-link layout-topbar-button mr-5">
-                    <h5 class="text-nowrap mb-0">My Bookings</h5>
-                    <span>My Bookings</span>
+            <div>
+                <NuxtLink v-if="showAdminRoute === true" to="/" class="p-link layout-topbar-button mr-5 modified-link">
+                    <h5 class="text-nowrap mb-0">Client Site</h5>
+                    <span>Client Site</span>
                 </NuxtLink>
-                <div class="mr-4">
-                    <NuxtLink v-if="!isClient" to="/admin-dashboard" class="p-link layout-topbar-button mr-5">
-                        <h5 class="text-nowrap mb-0">Admin Dashboard</h5>
-                        <span>Admin Dashboard</span>
-                    </NuxtLink>
-                    
-                    <NuxtLink v-else to="/admin-dashboard" class="p-link layout-topbar-button mr-5">
-                        <h5 class="text-nowrap mb-0">Admin Dashboard</h5>
-                        <span>Admin Dashboard</span>
-                    </NuxtLink>
-                    
-                </div>
+                <NuxtLink v-if="showClientRoute === true" to="/admin-dashboard" class="p-link layout-topbar-button mr-5 modified-link">
+                    <h5 class="text-nowrap mb-0">Dashboard</h5>
+                    <span>Dashboard</span>
+                </NuxtLink>
+            </div>
+            <NuxtLink v-if="isClient === true" to="/my-bookings" class="p-link layout-topbar-button mr-5 modified-link">
+                <h5 class="text-nowrap mb-0">My Bookings</h5>
+                <span>My Bookings</span>
+            </NuxtLink>
+
             <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
                 <i class="pi pi-user"></i>
                 <span>Profile</span>
@@ -141,8 +148,12 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
-.text-nowrap{
+.text-nowrap {
     text-wrap: nowrap;
-    color: inherit
+    color: inherit;
+}
+
+.modified-link {
+    margin-right: 65px !important;
 }
 </style>

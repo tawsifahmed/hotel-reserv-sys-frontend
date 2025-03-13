@@ -26,7 +26,7 @@ const handleSubmitData = async () => {
         errorHandler.value = false;
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`${url.public.apiUrl}/api/v1/floors/update/${id.value}`, {
+            const { data, pending } = await useFetch(`${url.public.apiUrl}/api/v1/rooms/update/${id.value}`, {
                 method: 'PUT',
                 headers: {
                     Authorization: `Bearer ${token.value}`

@@ -2,14 +2,13 @@ import { defineStore } from 'pinia';
 import apiLink from '../utils/apiLinks';
 export const useFloorStore = defineStore('floors', () => {
     
-    const filters = ref({});
     const floorList = ref([]);
     const floorsLength = ref(null);
 
 
     const getFloors = async () => {
         const token = useCookie('token');
-        const { data, pending, error } = await useAsyncData('tagsList', () =>
+        const { data, pending, error } = await useAsyncData('roomListP', () =>
             $fetch(`${apiLink}/api/v1/floors`, {
                 headers: {
                     Authorization: `Bearer ${token.value}`

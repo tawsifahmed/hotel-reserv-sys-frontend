@@ -1,9 +1,18 @@
 <script setup>
 const url = useRuntimeConfig();
 const toast = useToast();
+const props = defineProps({
+    param: {
+        type: Object,
+        required: true
+    }
+});
+const floorList = ref(props.param.floorList);
 
-const name = ref('');
-
+const roomNum = ref('');
+const selectedFloor = ref([]);
+const seatNo = ref(1);
+const roomPrice = ref();
 const errorHandler = ref(false);
 
 const emit = defineEmits(['closeCreateModal']);
@@ -16,7 +25,7 @@ const handleSubmitData = async () => {
         errorHandler.value = false;
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`${url.public.apiUrl}/api/v1/floors/store`, {
+            const { data, pending } = await useFetch(`${url.public.apiUrl}/api/v1/rooms/store`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -30,9 +39,9 @@ const handleSubmitData = async () => {
             if (data.value.code === 201) {
                 name.value = null;
                 emit('closeCreateModal', false);
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Floor Created successfully!', group: 'br', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Room created successfully!', group: 'br', life: 3000 });
             } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Floor Creation Failed!', group: 'br', life: 3000 });
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Room creation failed!', group: 'br', life: 3000 });
             }
         }
     }
@@ -41,7 +50,7 @@ const handleSubmitData = async () => {
 onMounted(() => {
     const createFloorName = document.getElementById('createFloorName');
     nextTick(() => {
-        if (createFloorName){
+        if (createFloorName) {
             createFloorName.focus();
         }
     });
@@ -51,11 +60,29 @@ onMounted(() => {
 <template>
     <div>
         <div class="field">
-            <label for="company"
-                >Floor Layout<i class="text-red-400 text-italic">*</i> 
-                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
-            </label>
-            <InputText id="createFloorName" v-model="name" class="w-full" placeholder="Enter floor name" />
+            <!-- {{ selectedFloor }} -->
+            <label>Room No.<i class="text-red-400 text-italic">*</i> </label>
+            <InputText id="createFloorName" v-model="roomNum" class="w-full" placeholder="Enter room number" />
+        </div>
+        <div class="field flex flex-column">
+            <label>Floor Layout<i class="text-red-500">*</i></label>
+            <Dropdown v-model="selectedFloor" :options="floorList" filter resetFilterOnHide optionLabel="name" placeholder="Select Floor" checkmark :highlightOnSelect="false" class="w-full" />
+        </div>
+        <div class="field flex flex-column seat-no">
+            <label for="company">No. of Seats<i class="text-red-400 text-italic">*</i> </label>
+            <InputNumber v-model="seatNo" showButtons buttonLayout="horizontal" style="width: 100%; text-align: center" :min="1" :max="99">
+                <template #incrementbuttonicon>
+                    <span class="pi pi-plus" />
+                </template>
+                <template #decrementbuttonicon>
+                    <span class="pi pi-minus" />
+                </template>
+            </InputNumber>
+        </div>
+        <div class="field flex flex-column">
+            <!-- {{ selectedFloor }} -->
+            <label for="company">Price<i class="text-red-400 text-italic">*</i> </label>
+            <InputNumber class="w-full" v-model="roomPrice" buttonLayout="horizontal" placeholder="Set room price" min="1" showButtons mode="currency" currency="USD" />
         </div>
 
         <p v-if="errorHandler" style="color: red">Please enter floor name</p>
@@ -65,8 +92,7 @@ onMounted(() => {
     </div>
 </template>
 
-
-<style lang="scss" scoped>
+<style lang="scss">
 .text-danger {
     color: red;
 }
@@ -74,5 +100,11 @@ onMounted(() => {
 .create-btn-wrapper {
     display: flex;
     justify-content: end;
+}
+
+.seat-no{
+    .p-inputnumber-input {
+        text-align: center !important;
+    }
 }
 </style>

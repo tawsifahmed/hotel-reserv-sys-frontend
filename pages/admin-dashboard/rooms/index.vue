@@ -1,6 +1,12 @@
 <script setup>
 import accessPermission from '~/composables/userTypeChecker';
-
+import { useFloorStore } from '~/store/floors';
+import { storeToRefs } from 'pinia'; 
+import { FilterMatchMode } from 'primevue/api';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
+const { getFloors } = useFloorStore();
+const { floorList } = storeToRefs(useFloorStore());
 const url = useRuntimeConfig();
 definePageMeta({
     middleware: 'auth',
@@ -9,11 +15,6 @@ definePageMeta({
 
 const isAdmin = ref(accessPermission('admin'));
 
-import { FilterMatchMode } from 'primevue/api';
-
-import Column from 'primevue/column';
-
-import DataTable from 'primevue/datatable';
 
 const filters = ref();
 
@@ -22,7 +23,7 @@ const loading1 = ref(false);
 
 const toast = useToast();
 
-const visibleCreateTag = ref(false);
+const visibleCreateRoom = ref(false);
 
 const visibleEditRoom = ref(false);
 
@@ -41,7 +42,7 @@ const priceTag = ref('');
 const floorLayout = ref('');
 
 const closeCreateModal = (evn) => {
-    visibleCreateTag.value = false;
+    visibleCreateRoom.value = false;
     init();
 };
 
@@ -51,7 +52,7 @@ const closeEditModal = (evn) => {
 };
 
 const handleCreateTagModal = () => {
-    visibleCreateTag.value = true;
+    visibleCreateRoom.value = true;
     init();
 };
 
@@ -72,7 +73,7 @@ const deleteRoom = (key) => {
 const confirmDeleteRoom = async () => {
     loading1.value = true;
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`${url.public.apiUrl}/tag/delete/${id.value}`, {
+    const { data, pending } = await useFetch(`${url.public.apiUrl}/rooms/delete/${id.value}`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -92,7 +93,7 @@ const confirmDeleteRoom = async () => {
 
 const init = async () => {
     const token = useCookie('token');
-    const { data, pending, error } = await useAsyncData('tagsList', () =>
+    const { data, pending, error } = await useAsyncData('roomList', () =>
         $fetch(`${url.public.apiUrl}/api/v1/rooms`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -115,6 +116,7 @@ onMounted(() => {
         throw createError({ statusCode: 404, message: 'Access denied!', fatal: true });
     }
     loading.value = false;
+    getFloors();
 });
 
 initFilters();
@@ -168,12 +170,12 @@ initFilters();
         </DataTable>
 
         <!-- Create -->
-        <Dialog v-model:visible="visibleCreateTag" modal header="Create Tag" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <RoomsCreateRoom @closeCreateModal="closeCreateModal($event)" />
+        <Dialog v-model:visible="visibleCreateRoom" modal header="Create Room" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <RoomsCreateRoom :param="{floorList}" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit -->
-        <Dialog v-model:visible="visibleEditRoom" modal header="Edit Tag" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleEditRoom" modal header="Edit Room" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <RoomsEditRoom :param="{ id, name }" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
