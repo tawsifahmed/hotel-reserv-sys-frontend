@@ -9,7 +9,7 @@ const props = defineProps({
 });
 const floorList = ref(props.param.floorList);
 
-const roomNum = ref('');
+const roomNo = ref('');
 const selectedFloor = ref([]);
 const seatNo = ref(1);
 const roomPrice = ref();
@@ -18,7 +18,7 @@ const errorHandler = ref(false);
 const emit = defineEmits(['closeCreateModal']);
 
 const handleSubmitData = async () => {
-    if (name.value === '') {
+    if (roomNo.value === '' || selectedFloor.value === '' || seatNo.value === '' || roomPrice.value === '') {
         errorHandler.value = true;
         return;
     } else {
@@ -31,13 +31,19 @@ const handleSubmitData = async () => {
                     Authorization: `Bearer ${token.value}`
                 },
                 body: {
-                    name: name.value
+                    name: roomNo.value,
+                    floor_id: selectedFloor.value.id,
+                    seats: seatNo.value,
+                    price_per_night: roomPrice.value
                 }
             });
             // return
 
             if (data.value.code === 201) {
-                name.value = null;
+                roomNo.value = null;
+                selectedFloor.value = null;
+                seatNo.value = null;
+                roomPrice.value = null;
                 emit('closeCreateModal', false);
                 toast.add({ severity: 'success', summary: 'Success', detail: 'Room created successfully!', group: 'br', life: 3000 });
             } else {
@@ -62,10 +68,13 @@ onMounted(() => {
         <div class="field">
             <!-- {{ selectedFloor }} -->
             <label>Room No.<i class="text-red-400 text-italic">*</i> </label>
-            <InputText id="createFloorName" v-model="roomNum" class="w-full" placeholder="Enter room number" />
+            <InputText id="createFloorName" v-model="roomNo" class="w-full" placeholder="Enter room number" />
         </div>
         <div class="field flex flex-column">
-            <label>Floor Layout<i class="text-red-500">*</i></label>
+            <label>Floor Layout<i class="text-red-500">* 
+                                <span v-tooltip.right="{ value: 'A floor must be created first, before creating a room.' }" class="pi pi-info-circle cursor-pointer text-primary text-sm instruction-tip"></span>
+
+            </i></label>
             <Dropdown v-model="selectedFloor" :options="floorList" filter resetFilterOnHide optionLabel="name" placeholder="Select Floor" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
         <div class="field flex flex-column seat-no">
@@ -102,7 +111,7 @@ onMounted(() => {
     justify-content: end;
 }
 
-.seat-no{
+.seat-no {
     .p-inputnumber-input {
         text-align: center !important;
     }

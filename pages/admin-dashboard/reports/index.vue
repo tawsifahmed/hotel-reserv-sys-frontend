@@ -10,7 +10,7 @@ definePageMeta({
     layout: 'default'
 });
 
-const isAdmin = ref(true);
+const isAdmin = ref(accessPermission('admin'));
 if(isAdmin.value === false){
   throw createError({statusCode: 404, message: 'Access denied!', fatal: true})
 }
@@ -140,6 +140,9 @@ const handleChange = (field, event) => {
 
 onMounted(() => {
     // init();
+    if (isAdmin.value === false) {
+        throw createError({ statusCode: 404, message: 'Access denied!', fatal: true });
+    }
 });
 
 const handleReset = () => {

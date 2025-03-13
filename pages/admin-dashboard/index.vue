@@ -4,15 +4,11 @@ import { onMounted, reactive, ref, watch } from 'vue';
 import accessPermission from '~/composables/userTypeChecker';
 
 definePageMeta({
-      middleware: 'auth',
-      layout: 'default'
-})
+    middleware: 'auth',
+    layout: 'default'
+});
 
 const isAdmin = ref(accessPermission('admin'));
-if(isAdmin.value === false){
-  throw createError({statusCode: 404, message: 'Access denied!', fatal: true})
-}
-
 
 const { isDarkTheme } = useLayout();
 const lineData = reactive({
@@ -43,7 +39,9 @@ const items = ref([
 const lineOptions = ref(null);
 
 onMounted(() => {
-    
+    if (isAdmin.value === false) {
+        throw createError({ statusCode: 404, message: 'Access denied!', fatal: true });
+    }
 });
 
 const formatCurrency = (value) => {

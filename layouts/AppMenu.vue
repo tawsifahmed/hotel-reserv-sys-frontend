@@ -6,9 +6,9 @@ const model = ref([
         label: 'Menu',
         items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/admin-dashboard' },
-            { label: 'Reservations', icon: 'pi pi-fw pi-cog', to: '/admin-dashboard/reservations' },
+            { label: 'Reservations', icon: 'pi pi-fw pi-bookmark', to: '/admin-dashboard/reservations' },
             { label: 'Floors', icon: 'pi pi-fw pi-th-large', to: '/admin-dashboard/floors' },
-            { label: 'Rooms', icon: 'pi pi-fw pi-question-circle', to: '/admin-dashboard/rooms' },
+            { label: 'Rooms', icon: 'pi pi-fw pi-ticket', to: '/admin-dashboard/rooms' },
             { label: 'Users', icon: 'pi pi-fw pi-users', to: '/admin-dashboard/users' }
         ]
     },

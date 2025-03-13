@@ -7,19 +7,13 @@ definePageMeta({
     layout: 'default'
 });
 
-const isAdmin = ref(true);
-if(isAdmin.value === false){
-  throw createError({statusCode: 404, message: 'Access denied!', fatal: true})
-}
-
+const isAdmin = ref(accessPermission('admin'));
 
 import { FilterMatchMode } from 'primevue/api';
 
 import Column from 'primevue/column';
 
 import DataTable from 'primevue/datatable';
-
-
 
 const filters = ref();
 
@@ -117,6 +111,9 @@ const initFilters = () => {
 };
 onMounted(() => {
     init();
+    if (isAdmin.value === false) {
+        throw createError({ statusCode: 404, message: 'Access denied!', fatal: true });
+    }
     loading.value = false;
 });
 
@@ -159,7 +156,7 @@ initFilters();
                 <template #body="slotProps">
                     <Button icon="pi pi-pencil" text class="" severity="success" rounded @click="editTag(slotProps.data)" />
                     <Button icon="pi pi-pencil" text class="" severity="success" rounded style="visibility: hidden" />
-                </template>  
+                </template>
             </Column>
             <!-- <template #footer> In total there are {{ tagsLists ? tagsLists.length : 0 }} rows. </template> -->
         </DataTable>

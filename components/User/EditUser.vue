@@ -91,7 +91,7 @@ onMounted(() => {
 
 <template>
     <div>
-        {{ props.param.userType }}
+        <!-- {{ props.param.userType }} -->
         <div class="field">
             <label for="company">Name<i class="text-red-500">*</i></label>
             <InputText id="editEmployeeName" v-model="name" class="w-full" placeholder="Enter Name"/>
@@ -99,7 +99,7 @@ onMounted(() => {
 
         <div class="field">
             <label for="email">Email address<i class="text-red-500">*</i></label>
-            <InputText type="email" v-model="email" class="w-full" placeholder="Enter Email"/>
+            <InputText type="email" v-model="email" class="w-full" :disabled="id === 1" placeholder="Enter Email"/>
         </div>
         <div class="field">
             <label for="worktype">Phone</label>
@@ -109,15 +109,9 @@ onMounted(() => {
             <label for="company">Address</label>
             <Textarea v-model="address" rows="3" cols="20" class="w-full" placeholder="Enter Address"/>
         </div>
-        <!-- <div class="field">
-            <label for="company">Password</label>
-            <InputText type="password" v-model="password" class="w-full" />
-        </div> -->
-
-        <!-- <pre>{{user_type}}</pre> -->
         <div class="field flex flex-column">
             <label>Role<i class="text-red-500">*</i></label>
-            <Dropdown v-model="selectedUserType" :options="typeList" filter resetFilterOnHide optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
+            <Dropdown v-model="selectedUserType" :disabled="id === 1" :options="typeList" filter resetFilterOnHide optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
         <div class="create-btn-wrappe">

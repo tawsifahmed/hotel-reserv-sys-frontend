@@ -31,13 +31,13 @@ const roomsList = ref([]);
 
 const visibleDeleteRoom = ref(false);
 
-const id = ref('');
+const roomId = ref('');
 
-const name = ref('');
+const roomNo = ref('');
 
-const seatNumbers = ref('');
+const seatNo = ref('');
 
-const priceTag = ref('');
+const roomPrice = ref('');
 
 const floorLayout = ref('');
 
@@ -57,23 +57,24 @@ const handleCreateTagModal = () => {
 };
 
 const editRoom = (data) => {
+    console.log(data);
     visibleEditRoom.value = true;
-    id.value = data.id;
-    name.value = data.name;
-    seats.value = data.email;
+    roomId.value = data.id;
+    roomNo.value = data.name;
+    seatNo.value = data.seats;
     floorLayout.value = data.floor;
-    priceTag.value = data.night_per_stay;
+    roomPrice.value = data.price_per_night;
 };
 
 const deleteRoom = (key) => {
     visibleDeleteRoom.value = true;
-    id.value = key;
+    roomId.value = key;
 };
 
 const confirmDeleteRoom = async () => {
     loading1.value = true;
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`${url.public.apiUrl}/rooms/delete/${id.value}`, {
+    const { data, pending } = await useFetch(`${url.public.apiUrl}/rooms/delete/${roomId.value}`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -176,7 +177,7 @@ initFilters();
 
         <!-- Edit -->
         <Dialog v-model:visible="visibleEditRoom" modal header="Edit Room" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <RoomsEditRoom :param="{ id, name }" @closeEditModal="closeEditModal($event)" />
+            <RoomsEditRoom :param="{ roomId, roomNo, seatNo, roomPrice, floorList, floorLayout }" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
         <Dialog v-model:visible="visibleDeleteRoom" header=" " dismissableMask="true" :style="{ width: '25rem' }">

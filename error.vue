@@ -26,13 +26,13 @@ const handleError = () => {
       <div>Params: {{ route.params }} </div>
       <div>Page Name: {{ route.name }} </div> -->
         <p class="text-7xl font-bold mb-0">{{error.statusCode}}</p>
-        <p class="mt-2 mb-3 text-6xl">Ops</p>
-        <i class="mt-2">
+        <p class="text-6xl mb-0" style="line-height: 1;">Ops</p>
+        <i class="mt-3">
             <b>
                 {{error.message}}
             </b>
         </i>
-        <p @click="handleError" class="cursor-pointer mt-4 bg-primary hover:bg-red-600 transition-all duration-100 text-white text-lg w-[fit-content] px-6 py-2 rounded-lg"> Go back to 
+        <p @click="handleError" class="cursor-pointer  mt-4 bg-primary hover:bg-red-600 transition-all duration-100 text-white text-lg w-[fit-content] px-6 py-2 rounded-lg"> Go back to 
             <a >
                 Home
               </a>

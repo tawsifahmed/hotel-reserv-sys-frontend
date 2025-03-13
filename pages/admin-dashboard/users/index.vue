@@ -15,7 +15,6 @@ import Column from 'primevue/column';
 
 import DataTable from 'primevue/datatable';
 
-
 const filters = ref();
 
 const loading = ref(true);
@@ -27,7 +26,6 @@ import Dialog from 'primevue/dialog';
 import { ref } from 'vue';
 
 const visibleCreateUser = ref(false);
-
 
 const visibleEditUser = ref(false);
 
@@ -59,7 +57,7 @@ const closeEditModal = (evn) => {
     init();
 };
 
-const handleCreateUserModal = () => { 
+const handleCreateUserModal = () => {
     visibleCreateUser.value = true;
 };
 
@@ -83,10 +81,10 @@ const editUser = (data) => {
 };
 
 const deleteEmployee = (key) => {
-    if(key === 1){
+    if (key === 1) {
         toast.add({ severity: 'error', summary: 'Error', detail: 'You can not delete root user!', group: 'br', life: 3000 });
         return;
-    }else{
+    } else {
         visibleDeleteUser.value = true;
         id.value = key;
     }
@@ -111,9 +109,7 @@ const confirmDeleteUser = async () => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete user!', group: 'br', life: 3000 });
         loading1.value = false;
     }
-
 };
-
 
 const init = async () => {
     const token = useCookie('token');
@@ -129,8 +125,6 @@ const init = async () => {
     }
 };
 
-
-
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS }
@@ -139,13 +133,12 @@ const initFilters = () => {
 
 onMounted(() => {
     init();
-    if(isAdmin.value === false){
-  throw createError({statusCode: 404, message: 'Access denied!', fatal: true})
-}
+    if (isAdmin.value === false) {
+        throw createError({ statusCode: 404, message: 'Access denied!', fatal: true });
+    }
     loading.value = false;
 });
 initFilters();
-
 </script>
 
 <template>
@@ -159,7 +152,7 @@ initFilters();
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
-                <Button icon="pi pi-plus" label="Create" @click="handleCreateUserModal" class="mr-2" severity="secondary"/>
+                <Button icon="pi pi-plus" label="Create" @click="handleCreateUserModal" class="mr-2" severity="secondary" />
             </template>
 
             <template #end>
@@ -172,8 +165,8 @@ initFilters();
             </template>
         </Toolbar>
 
-        <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows paginator :rowsPerPageOptions="[5, 10, 20, 50]" tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
-        <!-- <DataTable 
+        <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows paginator :rowsPerPageOptions="[5, 10, 20, 50]" tableStyle="min-width: 50rem" :rows="20" dataKey="id" filterDisplay="menu" :loading="loading">
+            <!-- <DataTable 
             v-model:filters="filters" 
             class="table-st" 
             :value="usersLists" 
@@ -198,8 +191,8 @@ initFilters();
             <Column field="type" header="User Type"></Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">
-                    <Button  icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editUser(slotProps.data)" />
-                    <Button  icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteEmployee(slotProps.data.id)" />
+                    <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editUser(slotProps.data)" />
+                    <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteEmployee(slotProps.data.id)" />
                 </template>
             </Column>
         </DataTable>
@@ -217,7 +210,7 @@ initFilters();
         <Dialog v-model:visible="visibleDeleteUser" header=" " :style="{ width: '25rem' }" dismissableMask="true">
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="visibleDeleteUser = false" />
-            <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteUser" :loading="loading1"/>
+            <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteUser" :loading="loading1" />
         </Dialog>
     </div>
 </template>
@@ -253,7 +246,7 @@ initFilters();
     border-color: #e2e8f0;
 }
 
-.filtr{
+.filtr {
     max-width: 200px !important;
     min-width: 200px !important;
 }

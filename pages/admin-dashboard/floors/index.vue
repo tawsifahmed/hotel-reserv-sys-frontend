@@ -14,14 +14,11 @@ definePageMeta({
 
 const isAdmin = ref(accessPermission('admin'));
 
-
 import { FilterMatchMode } from 'primevue/api';
 
 import Column from 'primevue/column';
 
 import DataTable from 'primevue/datatable';
-
-
 
 const filters = ref();
 
@@ -80,8 +77,7 @@ const confirmDeleteFloor = async () => {
     const { data, pending } = await useFetch(`${url.public.apiUrl}/api/v1/floors/delete/${id.value}`, {
         method: 'DELETE',
         headers: {
-            Authorization: `Bearer ${token.value}`,
-
+            Authorization: `Bearer ${token.value}`
         }
     });
 
@@ -89,7 +85,7 @@ const confirmDeleteFloor = async () => {
         visibleDeleteFloor.value = false;
         toast.add({ severity: 'success', summary: 'Success', detail: 'Floor deleted successfully!', group: 'br', life: 3000 });
         loading1.value = false;
-        if(floorsLength.value === 1){
+        if (floorsLength.value === 1) {
             location.reload();
         }
         getFloors();
@@ -108,12 +104,11 @@ const initFilters = () => {
 getFloors();
 onMounted(() => {
     loading.value = false;
-    if(isAdmin.value === false){
-  throw createError({statusCode: 404, message: 'Access denied!', fatal: true})
-}
+    if (isAdmin.value === false) {
+        throw createError({ statusCode: 404, message: 'Access denied!', fatal: true });
+    }
 });
 initFilters();
-
 </script>
 
 <template>
@@ -150,8 +145,8 @@ initFilters();
             <Column field="action" header="Action">
                 <template #body="slotProps">
                     <Button icon="pi pi-pencil" text class="" severity="success" rounded @click="editFloor(slotProps.data)" />
-                    <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteFloor(slotProps.data.id)" />    
-                </template>  
+                    <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteFloor(slotProps.data.id)" />
+                </template>
             </Column>
             <!-- <template #footer> In total there are {{ tagsLists ? tagsLists.length : 0 }} rows. </template> -->
         </DataTable>
