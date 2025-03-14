@@ -165,15 +165,19 @@ onMounted(() => {
     if (isAdmin.value === true) {
         if (router.currentRoute.value.path === '/' || router.currentRoute.value.path === '/my-bookings') {
             showClientRoute.value = true;
-        } else {
+        }
+    }
+    if (
+            router.currentRoute.value.path === '/admin-dashboard/' ||
             router.currentRoute.value.path === '/admin-dashboard' ||
             router.currentRoute.value.path === '/admin-dashboard/users' ||
             router.currentRoute.value.path === '/admin-dashboard/floors' ||
             router.currentRoute.value.path === '/admin-dashboard/rooms' ||
             router.currentRoute.value.path === '/admin-dashboard/reservations' ||
             router.currentRoute.value.path === '/admin-dashboard/reports'
-        }
-    }
+        ) {
+        showAdminRoute.value = true;
+    }   
 });
 
 const isMyBookingsRoute = ref(false);
@@ -236,8 +240,6 @@ const logout = () => {
         </div>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
-           
-
             <div>
                 <NuxtLink @click="handleRefresh('home')" v-if="showAdminRoute === true" to="/" class="p-link layout-topbar-button mr-5 modified-link">
                     <h5 class="text-nowrap mb-0 m-links">Client Site</h5>

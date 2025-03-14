@@ -131,7 +131,7 @@ onMounted(() => {
                 <!-- <pre>{{url.public.apiUrl}}</pre>
                 <pre>{{apiLink}}</pre> -->
                 <h1 class="text-white">Welcome to <b>HRS's</b> <i>Hotel Reservation System</i></h1>
-                <h2 class="text-white">Book a suitable room for you and your loved ones!</h2>
+                <h2 class="text-white">Book suitable rooms for you & your loved ones!</h2>
             </div>
             <Toolbar class="border-0 px-0 flex align-items-end mt-5" style="background-color: transparent; border: none; position: relative; top: 0px;">
                 <template #start>
@@ -161,8 +161,8 @@ onMounted(() => {
         <!-- Main Content -->
         <div class="dash">
             <h5 v-if="roomsList?.length > 0" class="text-start mb-3 ml-2" style="text-decoration: underline">Available Rooms: {{ roomsList?.length }}</h5>
-            <div class="grid container pt-10">
-                <div v-for="room in roomsList" :key="room" class="col-12 lg:col-6 xl:col-3">
+            <div class="grid container mt-3 pt-10 flex flex-wrap justify-content-center align-items-center gap-5">
+                <div v-for="room in roomsList" :key="room" class="">
                     <div class="mb-0 room-card">
                         <div>
                             <div class="bg-primary-800 w-fit px-2 py-1 room-title">
