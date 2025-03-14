@@ -80,7 +80,13 @@ onMounted(async () => {
                 <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
                 <Column field="index" header="Serial" sortable></Column>
 
-                <Column field="room.name" header="Room No."></Column>
+                <Column field="room.name" header="Room Number">
+                    <template #body="slotProps">
+                       <i>
+                           <b>Room No. {{slotProps.data.room.name}}</b>
+                       </i>
+                    </template>
+                   </Column>
                 <Column field="room.seats" header="Seats"></Column>
                 <Column field="room.floor.name" header="Floor Layout"></Column>
                 <Column field="start_date" header="Check In"></Column>
