@@ -85,7 +85,14 @@ onMounted(async () => {
                 <Column field="room.floor.name" header="Floor Layout"></Column>
                 <Column field="start_date" header="Check In"></Column>
                 <Column field="end_date" header="Check Out"></Column>
-                <Column field="room.price_per_night" header="Price"></Column>
+                <Column field="room.price_per_night" header="Price">
+                    <template #body="slotProps"> 
+                       <i>
+                           <b>$</b>{{slotProps.data.room.price_per_night }}
+                       </i>
+       
+                    </template>
+                   </Column>
                 <Column field="status" header="Status">
                     <template #body="slotProps">
                         <span :class="{
@@ -100,7 +107,7 @@ onMounted(async () => {
                 <!-- <Column field="phone" sortable header="Phone Number"></Column> -->
                 <Column field="action" header="Action">
                     <template #body="slotProps">
-                        <Button :disabled="slotProps.data.status === 'cancelled'" v-tooltip.top="{ value: 'Cancel reservation' }" icon="pi pi-times" text severity="danger" rounded @click="deleteFloor(slotProps.data.id)"/>
+                        <Button :disabled="slotProps.data.status === 'cancelled' || slotProps.data.status === 'confirmed'" v-tooltip.top="{ value: 'Cancel reservation' }" icon="pi pi-times" text severity="danger" rounded @click="deleteFloor(slotProps.data.id)"/>
                     </template>
                 </Column>
             </DataTable>

@@ -80,8 +80,8 @@ const pieChartData = computed(() => {
             datasets: [
                 {
                     data: [confirmedBookings.value, pendingBookings.value, cancelledBookings.value],
-                    backgroundColor: ['#33bd7c', '#0ea5e9', '#475569'],
-                    hoverBackgroundColor: ['#1a8251', '#0087c3', '#2c3644']
+                    backgroundColor: ['#33bd7c', '#FF9800', 'crimson'],
+                    hoverBackgroundColor: ['#1a8251', '#b76e02', '#9b132f']
                 }
             ]
         };
@@ -207,7 +207,7 @@ watch(
 
         </div>
         <div class="col-12 lg:col-6 xl:col-3">
-            <div class="card mb-0" :style="`border-left:6px solid #178d18bf;`">
+            <div class="card mb-0" :style="`border-left:6px solid #33bd7c;`">
                 <div  class="flex justify-content-between">
                     <h4 class="mb-0 block text-xl font-semibold tracking-tight">Confirmed Bookings</h4>
                     <div class="text-900 font-bold text-2xl">{{ confirmedBookings }}</div>
@@ -215,7 +215,7 @@ watch(
             </div>
         </div>
         <div class="col-12 lg:col-6 xl:col-3">
-            <div class="card mb-0" :style="`border-left:6px solid silver;`">
+            <div class="card mb-0" :style="`border-left:6px solid #FF9800;`">
                 <div  class="flex justify-content-between">
                     <h4 class="mb-0 block text-xl font-semibold tracking-tight">Pending Bookings</h4>
                     <div class="text-900 font-bold text-2xl">{{ pendingBookings }}</div>

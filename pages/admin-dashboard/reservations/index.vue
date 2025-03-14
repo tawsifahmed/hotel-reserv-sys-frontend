@@ -1,10 +1,9 @@
 <script setup>
 import accessPermission from '~/composables/userTypeChecker';
 import { FilterMatchMode } from 'primevue/api';
-
 import Column from 'primevue/column';
-
 import DataTable from 'primevue/datatable';
+
 const url = useRuntimeConfig();
 definePageMeta({
     middleware: 'auth',
@@ -18,47 +17,11 @@ const filters = ref();
 const loading = ref(true);
 const loading1 = ref(false);
 
-const visibleCreateTag = ref(false);
-
-const visibleEditTag = ref(false);
-
 const reservationsList = ref([]);
 
 const visibleDeleteTag = ref(false);
 
 const id = ref('');
-
-const name = ref('');
-
-const email = ref('');
-
-const phone = ref('');
-
-const address = ref('');
-
-const closeCreateModal = (evn) => {
-    visibleCreateTag.value = false;
-    init();
-};
-
-const closeEditModal = (evn) => {
-    visibleEditTag.value = false;
-    init();
-};
-
-const handleCreateTagModal = () => {
-    visibleCreateTag.value = true;
-    init();
-};
-
-const editTag = (data) => {
-    visibleDeleteTag.value = true;
-    id.value = data.id;
-    name.value = data.name;
-    email.value = data.email;
-    phone.value = data.phone;
-    address.value = data.address;
-};
 
 const actionType = ref(null)
 const actionModalMsg = ref(null)
@@ -169,7 +132,14 @@ initFilters();
             <Column field="room.floor.name" header="Floor Layout"></Column>
             <Column field="start_date" header="Check In"></Column>
             <Column field="end_date" header="Check Out"></Column>
-            <Column field="room.price_per_night" header="Price"></Column>
+            <Column field="room.price_per_night" header="Price">
+             <template #body="slotProps"> 
+                <i>
+                    <b>$</b>{{slotProps.data.room.price_per_night }}
+                </i>
+
+             </template>
+            </Column>
             <Column field="user.name" header="Booked By"></Column>
             <Column field="status" header="Status">
                 <template #body="slotProps">
@@ -195,11 +165,6 @@ initFilters();
         <!-- Create -->
         <Dialog v-model:visible="visibleCreateTag" modal header="Create Tag" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <TagsCreateTag @closeCreateModal="closeCreateModal($event)" />
-        </Dialog>
-
-        <!-- Edit -->
-        <Dialog v-model:visible="visibleEditTag" modal header="Edit Tag" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TagsEditTag :param="{ id, name }" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
         <Dialog v-model:visible="visibleDeleteTag" header=" " dismissableMask="true" :style="{ width: '25rem' }">

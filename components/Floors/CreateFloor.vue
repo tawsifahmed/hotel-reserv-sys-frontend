@@ -53,9 +53,8 @@ onMounted(() => {
         <div class="field">
             <label for="company"
                 >Floor Layout<i class="text-red-400 text-italic">*</i> 
-                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
             </label>
-            <InputText id="createFloorName" v-model="name" class="w-full" placeholder="Enter floor name" />
+            <InputText id="createFloorName" v-model="name" class="w-full" placeholder="S floor name" />
         </div>
 
         <p v-if="errorHandler" style="color: red">Please enter floor name</p>

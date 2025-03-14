@@ -1,6 +1,7 @@
 <script setup>
 import { nextTick, onMounted } from 'vue';
 
+const emit = defineEmits(['closeCreateModal']);
 const url = useRuntimeConfig();
 const props = defineProps({
     param: {
@@ -8,28 +9,15 @@ const props = defineProps({
         required: true
     }
 });
-const rolesLists = ref(props.param.rolesLists);
-
-const selectedRoles = ref([]);
-
 const toast = useToast();
 
 const name = ref('');
-
 const email = ref('');
-
 const phone = ref('');
 const address = ref('');
-
 const password = ref('');
-
-const password_confirmation = ref('');
-
 const errorHandler = ref(false);
 
-const employeeForm = ref(true);
-
-const emit = defineEmits(['closeCreateModal']);
 
 const loading = ref(false);
 const handleSubmitData = async () => {
@@ -71,7 +59,6 @@ const handleSubmitData = async () => {
                 phone.value = null;
                 address.value = null;
                 password.value = null;
-                employeeForm.value = false;
                 emit('closeCreateModal', false);
                 toast.add({ severity: 'success', summary: 'Success', detail: 'Employee created successfully!', group: 'br', life: 3000 });
                 return;

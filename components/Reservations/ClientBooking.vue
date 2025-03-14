@@ -1,5 +1,4 @@
 <script setup>
-import { nextTick, onMounted } from 'vue';
 
 const url = useRuntimeConfig();
 const props = defineProps({
@@ -14,7 +13,6 @@ const toast = useToast();
 
 const errorHandler = ref(false);
 
-const employeeForm = ref(true);
 
 const emit = defineEmits(['closeCreateModal']);
 
@@ -36,7 +34,6 @@ const handleSubmitData = async () => {
             });
 
             if(data.value.code === 201) {
-                employeeForm.value = false;
                 loading.value = false;
                 emit('closeCreateModal', false);
                 await toast.add({ severity: 'success', summary: 'Success', detail: 'Booking created successfully!', group: 'br', life: 3000 });
@@ -56,20 +53,20 @@ const handleSubmitData = async () => {
         <!-- {{ bookingData }} -->
         <div class="field">
             <label>Name<i class="text-red-400 text-italic">*</i> </label>
-            <InputText v-model="bookingData.roomName" class="w-full" disabled placeholder="Room No." />
+            <InputText v-model="bookingData.roomName" class="w-full" disabled />
         </div>
         <pre>pre{{ bookingData }}</pre>
         <div class="field">
             <label>Check In<i class="text-red-400">*</i> </label>
-            <InputText v-model="bookingData.start_date" class="w-full" disabled placeholder="Enter Email" />
+            <InputText v-model="bookingData.start_date" class="w-full" disabled />
         </div>
         <div class="field">
             <label>Check Out<i class="text-red-400">*</i> </label>
-            <InputText v-model="bookingData.end_date" class="w-full" disabled placeholder="Enter Email" />
+            <InputText v-model="bookingData.end_date" class="w-full" disabled />
         </div>
         <div class="field">
             <label>Floor Layout<i class="text-red-400 text-italic">*</i> </label>
-            <InputText v-model="bookingData.floorName" class="w-full" disabled placeholder="Room No." />
+            <InputText v-model="bookingData.floorName" class="w-full" disabled />
         </div>
         <div class="field">
             <label>Price<i class="text-red-400 text-italic">*</i> </label>

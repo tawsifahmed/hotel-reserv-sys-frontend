@@ -304,7 +304,7 @@ onMounted(() => {
                     </div>
                     <form @submit.prevent="newPasswordHandler">
                         <div class="field md:w-28rem mb-5">
-                            <label for="password" class="block text-900 font-medium text-xl mb-2">New Password1</label>
+                            <label for="password" class="block text-900 font-medium text-xl mb-2">New Password</label>
                             <Password id="password" v-model="newPassword.password" placeholder="Enter password" :feedback="false" :toggleMask="true" class="w-full" inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>
                         </div>
                         <div class="field md:w-28rem mb-5">

@@ -54,14 +54,6 @@ const handleSubmitData = async () => {
     }
 };
 
-onMounted(() => {
-    const createFloorName = document.getElementById('createFloorName');
-    nextTick(() => {
-        if (createFloorName) {
-            createFloorName.focus();
-        }
-    });
-});
 </script>
 
 <template>
@@ -69,7 +61,7 @@ onMounted(() => {
         <div class="field flex flex-column">
             <!-- {{ selectedFloor }} -->
             <label>Room No.<i class="text-red-400 text-italic">*</i> </label>
-            <InputNumber v-model="roomNo" :min="1"  inputId="withoutgrouping" :useGrouping="false" />
+            <InputNumber v-model="roomNo" :min="1" inputId="withoutgrouping" :useGrouping="false" />
         </div>
         <div class="field flex flex-column">
             <label>Floor Layout<i class="text-red-500">* 

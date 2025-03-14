@@ -122,9 +122,6 @@ initFilters();
         <Toolbar class="border-0 px-0">
             <template #start>
                 <Button icon="pi pi-plus" label="Create" @click="handleCreateFloorModal" class="mr-2" severity="secondary" />
-                <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
-                <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" />
-                <Button icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" /> -->
             </template>
 
             <template #end>
@@ -137,7 +134,7 @@ initFilters();
             </template>
         </Toolbar>
 
-        <DataTable v-model:filters="filters" class="table-st" :value="floorListwithIndex" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="tableLoader">
+        <DataTable v-model:filters="filters" class="table-st" :value="floorListwithIndex" stripedRows paginator tableStyle="min-width: 50rem" :rows="20" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="tableLoader">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>

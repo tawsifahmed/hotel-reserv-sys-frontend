@@ -39,19 +39,19 @@ const handleSubmitData = async () => {
             if (data.value.code === 200) {
                 employeeForm.value = false;
                 emit('closeEditModal', false);
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Tag Updated successfully!', group: 'br', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Floor updated successfully!', group: 'br', life: 3000 });
             } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Tag Update Failed!', group: 'br', life: 3000 });
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Floor update Failed!', group: 'br', life: 3000 });
             }
         }
     }
 };
 
 onMounted(() => {
-    const editTagName = document.getElementById('editTagName');
+    const editFloorName = document.getElementById('editFloorName');
     nextTick(() => {
-        if (editTagName){
-            editTagName.focus();
+        if (editFloorName){
+            editFloorName.focus();
         }
     });
 });
@@ -61,10 +61,10 @@ onMounted(() => {
     <div>
         <div class="field">
             <label for="company">Name<i class="text-red-400 text-italic">*</i> </label>
-            <InputText id="editTagName" v-model="name" class="w-full" placeholder="Edit tag name" />
+            <InputText id="editFloorName" v-model="name" class="w-full" placeholder="Edit floor name" />
         </div>
 
-        <p v-if="errorHandler" style="color: red">Please enter tag name</p>
+        <p v-if="errorHandler" style="color: red">Please enter floor name</p>
         <div class="create-btn-wrappe">
             <Button label="Update" icon="pi pi-check" text="" @click="handleSubmitData" />
         </div>

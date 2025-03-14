@@ -71,28 +71,8 @@ const deleteRoom = (key) => {
     roomId.value = key;
 };
 
-const confirmDeleteRoom = async () => {
-    loading1.value = true;
-    const token = useCookie('token');
-    const { data, pending } = await useFetch(`${url.public.apiUrl}/api/v1/rooms/delete/${roomId.value}`, {
-        method: 'DELETE',
-        headers: {
-            Authorization: `Bearer ${token.value}`
-        }
-    });
-    
 
-    if (data.value.code === 200) {
-        visibleDeleteRoom.value = false;
-        toast.add({ severity: 'success', summary: 'Success', detail: 'Room deleted successfully!', group: 'br', life: 3000 });
-        loading1.value = false;
-        init();
-    } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete!', group: 'br', life: 3000 });
-        loading1.value = false;
-    }
-};
-
+const roomsLength = ref(null);
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('roomList', () =>
@@ -118,6 +98,38 @@ const init = async () => {
         });
 
         roomsList.value = uniqueRooms;
+        if (roomsList.value.length === 1) {
+                roomsLength.value = 1;
+                
+            }else{
+                roomsLength.value = null;
+            }
+    }
+};
+
+
+const confirmDeleteRoom = async () => {
+    loading1.value = true;
+    const token = useCookie('token');
+    const { data, pending } = await useFetch(`${url.public.apiUrl}/api/v1/rooms/delete/${roomId.value}`, {
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        }
+    });
+    
+
+    if (data.value.code === 200) {
+        visibleDeleteRoom.value = false;
+        toast.add({ severity: 'success', summary: 'Success', detail: 'Room deleted successfully!', group: 'br', life: 3000 });
+        loading1.value = false;
+        if (roomsLength.value === 1) {
+            location.reload();
+        }
+        init();
+    } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete!', group: 'br', life: 3000 });
+        loading1.value = false;
     }
 };
 

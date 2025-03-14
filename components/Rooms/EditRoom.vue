@@ -60,14 +60,7 @@ const handleSubmitData = async () => {
     }
 };
 
-onMounted(() => {
-    const editTagName = document.getElementById('editTagName');
-    nextTick(() => {
-        if (editTagName){
-            editTagName.focus();
-        }
-    });
-});
+
 </script>
 
 <template>
@@ -76,7 +69,7 @@ onMounted(() => {
         <!-- {{seatNo}} -->
         <div class="field flex flex-column">
             <label>Room No.<i class="text-red-400 text-italic">*</i> </label>
-            <InputNumber v-model="roomNo" :min="1"  inputId="withoutgrouping" :useGrouping="false" />
+            <InputNumber v-model="roomNo" :min="1" inputId="withoutgrouping" :useGrouping="false" />
         </div>
         <div class="field flex flex-column">
             <label>Floor Layout<i class="text-red-500">*</i></label>
