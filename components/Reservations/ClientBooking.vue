@@ -55,7 +55,7 @@ const handleSubmitData = async () => {
             <label>Name<i class="text-red-400 text-italic">*</i> </label>
             <InputText v-model="bookingData.roomName" class="w-full" disabled />
         </div>
-        <pre>pre{{ bookingData }}</pre>
+        <!-- <pre>pre{{ bookingData }}</pre> -->
         <div class="field">
             <label>Check In<i class="text-red-400">*</i> </label>
             <InputText v-model="bookingData.start_date" class="w-full" disabled />

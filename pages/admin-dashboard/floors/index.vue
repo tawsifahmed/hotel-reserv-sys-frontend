@@ -5,46 +5,34 @@ import accessPermission from '~/composables/userTypeChecker';
 import { FilterMatchMode } from 'primevue/api';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable'
+
 const { getFloors } = useFloorStore();
 const { floorList, floorsLength } = storeToRefs(useFloorStore());
-
+const isAdmin = ref(accessPermission('admin'));
 const url = useRuntimeConfig();
+const toast = useToast();
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
 });
 
-const floorListwithIndex = computed(() => {
+const floorListWithIndex = computed(() => {
     return floorList.value.map((item, index) => {
         return { ...item, index: index + 1 };
     });
 });
 
-const isAdmin = ref(accessPermission('admin'));
 const filters = ref();
-
-const loading = ref(true);
 const loading1 = ref(false);
 
-const toast = useToast();
 
 const visibleCreateFloor = ref(false);
-
 const visibleEditFloor = ref(false);
-
-const tagsLists = ref([]);
-
 const visibleDeleteFloor = ref(false);
 
 const id = ref('');
-
 const name = ref('');
 
-const email = ref('');
-
-const phone = ref('');
-
-const address = ref('');
 
 const closeCreateModal = (evn) => {
     visibleCreateFloor.value = false;
@@ -109,7 +97,7 @@ onMounted(async() => {
     }
     await getFloors();
     tableLoader.value = false;
-    loading.value = false;
+    
 });
 initFilters();
 </script>
@@ -134,7 +122,7 @@ initFilters();
             </template>
         </Toolbar>
 
-        <DataTable v-model:filters="filters" class="table-st" :value="floorListwithIndex" stripedRows paginator tableStyle="min-width: 50rem" :rows="20" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="tableLoader">
+        <DataTable v-model:filters="filters" class="table-st" :value="floorListWithIndex" stripedRows paginator tableStyle="min-width: 50rem" :rows="20" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="tableLoader">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
@@ -148,7 +136,6 @@ initFilters();
                     <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteFloor(slotProps.data.id)" />
                 </template>
             </Column>
-            <!-- <template #footer> In total there are {{ tagsLists ? tagsLists.length : 0 }} rows. </template> -->
         </DataTable>
 
         <!-- Create -->

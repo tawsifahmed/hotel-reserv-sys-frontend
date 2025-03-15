@@ -22,9 +22,6 @@ definePageMeta({
 const regForm = ref(true);
 const verifyOTPForm = ref(false);
 
-// const regForm = ref(false)
-// const verifyOTPForm = ref(true)
-
 const createUser = ref({
     userName: null,
     email: null,
@@ -74,9 +71,6 @@ const handleLoginSubmit = async () => {
         } else if (userCreated.value === true) {
             console.log('authenticated =>', authenticated.value);
             toast.add({ severity: 'success', summary: 'Successfully Registered', detail: 'Proceeding to login.', group: 'br', life: 5000 });
-            // setTimeout(() => {
-            //     router.push('/login')
-            // }, 300);
         } else {
             toast.add({ severity: 'error', summary: 'Registration Error', detail: '', group: 'br', life: 3000 });
         }
@@ -96,7 +90,7 @@ const clickBlink = ref(false);
             <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
                 <div v-if="regForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
-                        <img src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
+                        <img v-tooltip.top="{ value: 'Hotel Reservation System' }" src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
                         <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Sign Up</div>
                     </div>
 
@@ -107,7 +101,7 @@ const clickBlink = ref(false);
                             <small id="name-help" class="error-report red-text" v-if="errorData.userNameError"> <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Full name required! </small>
                         </div>
                         <div class="field md:w-28rem mb-4">
-                            <label for="email" class="block text-900 text-xl font-medium mb-2">Work Email</label>
+                            <label for="email" class="block text-900 text-xl font-medium mb-2">Email</label>
                             <InputText id="email" v-model="createUser.email" type="email" placeholder="example@gmail.com" class="w-full" style="padding: 1rem" />
                             <small id="email-help" class="error-report red-text" v-if="errorData.emailError"> <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Email required! </small>
                         </div>
@@ -139,8 +133,7 @@ const clickBlink = ref(false);
                         <Button type="submit" label="Sign Up" :loading="regBtnHandle" class="w-full p-3 text-xl"></Button>
                     </form>
                     <div class="flex flex-wrap items-center justify-between mt-4">
-                        Already have an account? &nbsp;<NuxtLink to="/login" class="forgot_pass md:mb-0">Click Here. </NuxtLink>
-                        <!-- <nuxt-link to="/" class="forgot_pass">Forgot password?</nuxt-link> -->
+                        Already have an account? &nbsp;<NuxtLink to="/login" class="forgot_pass md:mb-0">Click Here </NuxtLink>
                     </div>
                 </div>
             </div>

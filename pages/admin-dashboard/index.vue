@@ -2,22 +2,21 @@
 import { useLayout } from '@/layouts/composables/layout';
 import { onMounted, reactive, ref, watch } from 'vue';
 import accessPermission from '~/composables/userTypeChecker';
-const url = useRuntimeConfig();
 
+const url = useRuntimeConfig();
+const isAdmin = ref(accessPermission('admin'));
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
 });
 
-const isAdmin = ref(accessPermission('admin'));
 
 const reservationsList = ref([]);
 const pendingBookings = ref();
 const confirmedBookings = ref();
 const cancelledBookings = ref();
 
-const init = async () => {
-    
+const init = async () => {    
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('rsrvationList', () =>
         $fetch(`${url.public.apiUrl}/api/v1/reservations`, {

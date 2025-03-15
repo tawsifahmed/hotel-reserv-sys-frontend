@@ -190,11 +190,11 @@ getUserData();
 
 const handleRefresh = async(route) => {
     if(route === 'admin'){
-        await navigateTo({ path: `/admin-dashboard/` });
+        await navigateTo({ path: `/admin-dashboard` });
         return location.reload();
     }
     if(route === 'booking'){
-        await navigateTo({ path: `/my-booking/` });
+        await navigateTo({ path: `/my-booking` });
         return location.reload();
     }
     if(route === 'home'){

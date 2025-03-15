@@ -80,7 +80,7 @@ const editUser = (data) => {
     });
 };
 
-const deleteEmployee = (key) => {
+const deleteUser = (key) => {
     if (key === 1) {
         toast.add({ severity: 'error', summary: 'Error', detail: 'You can not delete root user!', group: 'br', life: 3000 });
         return;
@@ -100,7 +100,7 @@ const confirmDeleteUser = async () => {
         }
     });
 
-    if (data.value.code === 200) {
+    if (data.value?.code === 200) {
         visibleDeleteUser.value = false;
         toast.add({ severity: 'success', summary: 'Success', detail: 'User deleted successfully!', group: 'br', life: 3000 });
         loading1.value = false;
@@ -130,8 +130,8 @@ const initFilters = () => {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS }
     };
 };
-const tableLoader = ref(true);
 
+const tableLoader = ref(true);
 onMounted(async() => {
     if (isAdmin.value === false) {
         throw createError({ statusCode: 404, message: 'Access denied!', fatal: true });
@@ -168,22 +168,6 @@ initFilters();
         </Toolbar>
 
         <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows paginator :rowsPerPageOptions="[5, 10, 20, 50]" tableStyle="min-width: 50rem" :rows="20" dataKey="id" filterDisplay="menu" :loading="tableLoader">
-            <!-- <DataTable 
-            v-model:filters="filters" 
-            class="table-st" 
-            :value="usersLists" 
-            stripedRows 
-            tableStyle="min-width: 50rem" 
-            :rows="10" 
-            dataKey="id" 
-            filterDisplay="menu" 
-            :loading="loading || isLoading"
-
-            :paginator="true"
-            :totalRecords="totalRecords"
-            :rowsPerPageOptions="[5, 10, 20, 50]"
-            @page="onPage"
-        > -->
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
@@ -194,7 +178,7 @@ initFilters();
             <Column field="action" header="Action">
                 <template #body="slotProps">
                     <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editUser(slotProps.data)" />
-                    <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteEmployee(slotProps.data.id)" />
+                    <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteUser(slotProps.data.id)" />
                 </template>
             </Column>
         </DataTable>

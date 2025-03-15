@@ -57,6 +57,16 @@ const confirmDeleteFloor = async () => {
     }
 };
 
+const dateFormatter = (data) => {
+    const dateStr = data;
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-11
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+};
+
 const tableLoader = ref(true);
 onMounted(async () => {
     await init();
@@ -91,6 +101,13 @@ onMounted(async () => {
                 <Column field="room.floor.name" header="Floor Layout"></Column>
                 <Column field="start_date" header="Check In"></Column>
                 <Column field="end_date" header="Check Out"></Column>
+                <Column field="created_at" header="Booked At">
+                    <template #body="slotProps">
+                       <p>
+                        {{dateFormatter(slotProps?.data?.created_at)}}
+                       </p>
+                     </template>
+                </Column>
                 <Column field="room.price_per_night" header="Price">
                     <template #body="slotProps"> 
                        <i>
@@ -109,8 +126,6 @@ onMounted(async () => {
                     </span>
                     </template>
                 </Column>
-                <!-- <Column field="email" sortable header="Email Address"></Column> -->
-                <!-- <Column field="phone" sortable header="Phone Number"></Column> -->
                 <Column field="action" header="Action">
                     <template #body="slotProps">
                         <Button :disabled="slotProps.data.status === 'cancelled' || slotProps.data.status === 'confirmed'" v-tooltip.top="{ value: 'Cancel reservation' }" icon="pi pi-times" text severity="danger" rounded @click="deleteFloor(slotProps.data.id)"/>

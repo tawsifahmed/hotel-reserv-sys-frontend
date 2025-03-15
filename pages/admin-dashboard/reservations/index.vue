@@ -5,26 +5,23 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 
 const url = useRuntimeConfig();
+const toast = useToast();
+const isAdmin = ref(accessPermission('admin'));
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
 });
 
-const toast = useToast();
-
-const isAdmin = ref(accessPermission('admin'));
+const reservationsList = ref([]);
 const filters = ref();
 const loading = ref(true);
 const loading1 = ref(false);
-
-const reservationsList = ref([]);
-
 const visibleDeleteTag = ref(false);
 
 const id = ref('');
+const actionType = ref(null);
+const actionModalMsg = ref(null);
 
-const actionType = ref(null)
-const actionModalMsg = ref(null)
 const actionOnRsrv = (key, type) => {
     id.value = key;
     if(type === 'hold'){
@@ -89,6 +86,17 @@ const initFilters = () => {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS }
     };
 };
+
+const dateFormatter = (data) => {
+    const dateStr = data;
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-11
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+};
+
 onMounted(() => {
     init();
     if (isAdmin.value === false) {
@@ -107,9 +115,6 @@ initFilters();
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
-                <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
-                <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" />
-                <Button icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" /> -->
             </template>
 
             <template #end>
@@ -138,6 +143,13 @@ initFilters();
             <Column field="room.floor.name" header="Floor Layout"></Column>
             <Column field="start_date" header="Check In"></Column>
             <Column field="end_date" header="Check Out"></Column>
+            <Column field="created_at" header="Booked At">
+                <template #body="slotProps">
+                   <p>
+                    {{dateFormatter(slotProps?.data?.created_at)}}
+                   </p>
+                 </template>
+            </Column>
             <Column field="room.price_per_night" header="Price">
              <template #body="slotProps"> 
                 <i>
@@ -165,7 +177,6 @@ initFilters();
 
                 </template>
             </Column>
-            <!-- <template #footer> In total there are {{ reservationsList ? reservationsList.length : 0 }} rows. </template> -->
         </DataTable>
 
         <!-- Create -->
@@ -173,7 +184,7 @@ initFilters();
             <TagsCreateTag @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
-        <Dialog v-model:visible="visibleDeleteTag" header=" " dismissableMask="true" :style="{ width: '25rem' }">
+        <Dialog v-model:visible="visibleDeleteTag" :header="actionModalMsg?.charAt(0).toUpperCase() + actionModalMsg?.slice(1)" dismissableMask="true" :style="{ width: '25rem' }">
             <p>Are you sure you want to <span> <b>{{actionModalMsg}}</b> </span> this reservation?</p>
             <Button label="No" icon="pi pi-times" text @click="visibleDeleteTag = false" />
             <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteTag" :loading="loading1" />

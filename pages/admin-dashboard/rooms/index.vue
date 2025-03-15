@@ -5,40 +5,31 @@ import { storeToRefs } from 'pinia';
 import { FilterMatchMode } from 'primevue/api';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
+
 const { getFloors } = useFloorStore();
 const { floorList } = storeToRefs(useFloorStore());
 const url = useRuntimeConfig();
+const isAdmin = ref(accessPermission('admin'));
+const toast = useToast();
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
 });
 
-const isAdmin = ref(accessPermission('admin'));
-
 
 const filters = ref();
-
 const loading = ref(true);
 const loading1 = ref(false);
 
-const toast = useToast();
-
-const visibleCreateRoom = ref(false);
-
-const visibleEditRoom = ref(false);
-
 const roomsList = ref([]);
-
+const visibleCreateRoom = ref(false);
+const visibleEditRoom = ref(false);
 const visibleDeleteRoom = ref(false);
 
 const roomId = ref('');
-
 const roomNo = ref('');
-
 const seatNo = ref('');
-
 const roomPrice = ref('');
-
 const floorLayout = ref('');
 
 const closeCreateModal = (evn) => {
@@ -59,18 +50,17 @@ const handleCreateTagModal = () => {
 const editRoom = (data) => {
     console.log(data);
     visibleEditRoom.value = true;
-    roomId.value = data.id;
-    roomNo.value = data.name;
-    seatNo.value = data.seats;
-    floorLayout.value = data.floor;
-    roomPrice.value = data.price_per_night;
+    roomId.value = data?.id;
+    roomNo.value = data?.name;
+    seatNo.value = data?.seats;
+    floorLayout.value = data?.floor;
+    roomPrice.value = data?.price_per_night;
 };
 
 const deleteRoom = (key) => {
     visibleDeleteRoom.value = true;
     roomId.value = key;
 };
-
 
 const roomsLength = ref(null);
 const init = async () => {
@@ -118,8 +108,7 @@ const confirmDeleteRoom = async () => {
         }
     });
     
-
-    if (data.value.code === 200) {
+    if (data.value?.code === 200) {
         visibleDeleteRoom.value = false;
         toast.add({ severity: 'success', summary: 'Success', detail: 'Room deleted successfully!', group: 'br', life: 3000 });
         loading1.value = false;
@@ -138,6 +127,7 @@ const initFilters = () => {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS }
     };
 };
+
 const tableLoader = ref(true);
 onMounted(async() => {
     if (isAdmin.value === false) {

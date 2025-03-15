@@ -2,9 +2,7 @@
 import { useLayout } from '@/layouts/composables/layout';
 import { ref, computed } from 'vue';
 import AppConfig from '@/layouts/AppConfig.vue';
-import accessPermission from '~/composables/userTypeChecker';
 
-const isAdmin = ref(accessPermission('admin'));
 const { layoutConfig } = useLayout();
 const logoUrl = computed(() => {
     return `/layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
@@ -132,8 +130,6 @@ const handleVerifySubmit = async () => {
     }
 };
 
-const clickBlink = ref(false);
-
 // Reset Functionality
 const resetEmail = ref('');
 const handleReset = () => {
@@ -233,13 +229,13 @@ onMounted(() => {
             <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
                 <div v-if="loginForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
-                        <img src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
+                        <img v-tooltip.top="{ value: 'Hotel Reservation System' }" src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
                         <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Sign in to continue</div>
                     </div>
 
                     <form @submit.prevent="handleLoginSubmit">
                         <div class="field md:w-28rem mb-4">
-                            <label for="email" class="block text-900 text-xl font-medium mb-2">Work Email</label>
+                            <label for="email" class="block text-900 text-xl font-medium mb-2">Email</label>
                             <InputText id="email" v-model="user.email" type="email" placeholder="Enter your work email" class="w-full" style="padding: 1rem" />
                             <small id="email-help" class="error-report red-text red-text" v-if="errorData.emailError"> <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Email required! </small>
                         </div>
@@ -259,12 +255,12 @@ onMounted(() => {
                     </form>
                     
                     <div class="flex flex-wrap items-center justify-between mt-4">
-                        Don't have an account?&nbsp; <NuxtLink to="/register" class="forgot_pass md:mb-0"> Click Here.</NuxtLink>
+                        Don't have an account?&nbsp; <NuxtLink to="/register" class="forgot_pass md:mb-0"> Click Here</NuxtLink>
                     </div>
                 </div>
                 <div v-if="resetForm == 'email'" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
-                        <img src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
+                        <img v-tooltip.top="{ value: 'Hotel Reservation System' }" src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
                         <div data-v-d804f83c="" class="text-900 text-3xl font-medium mt-1 mb-3">Reset Password</div>
                     </div>
                     <form @submit.prevent="handleEmailSubmit">
@@ -299,7 +295,7 @@ onMounted(() => {
                 </div>
                 <div v-if="resetForm == 'new-password'" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
-                        <img src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
+                        <img v-tooltip.top="{ value: 'Hotel Reservation System' }" src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
                         <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Set Your New Password</div>
                     </div>
                     <form @submit.prevent="newPasswordHandler">

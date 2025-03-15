@@ -1,27 +1,19 @@
 <script setup>
 import accessPermission from '~/composables/userTypeChecker';
 
-import { storeToRefs } from 'pinia';
-import RadioButton from 'primevue/radiobutton';
-
+const isAdmin = ref(accessPermission('admin'));
 const url = useRuntimeConfig();
+const toast = useToast();
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
 });
 
-const isAdmin = ref(accessPermission('admin'));
-if(isAdmin.value === false){
-  throw createError({statusCode: 404, message: 'Access denied!', fatal: true})
-}
-
 const startDate = ref('');
-
 const endDate = ref('');
 const selectedStatus = ref();
 const loading = ref(false);
 const loading1 = ref(false);
-const toast = useToast();
 const statusList = ref([
     { name: 'Pending', code: 'pending' },
     { name: 'Approved', code: 'confirmed' },
@@ -96,7 +88,6 @@ const handleReset = () => {
 </script>
 <template>
     <div class="card">
-        <!-- <pre>{{ usersListStore }}</pre> -->
         <Toast position="bottom-right" group="br" />
         <div class="d-flex mr-2">
             <h5 class="mb-1">Reports 

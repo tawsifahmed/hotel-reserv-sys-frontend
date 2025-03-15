@@ -5,10 +5,9 @@ import { onMounted } from 'vue';
 import { useFloorStore } from '~/store/floors';
 import { storeToRefs } from 'pinia';
 
-const url = useRuntimeConfig();
 const { getFloors } = useFloorStore();
 const { floorList } = storeToRefs(useFloorStore());
-
+const url = useRuntimeConfig();
 const toast = useToast();
 
 definePageMeta({
@@ -22,6 +21,7 @@ const endDate = ref(null);
 const selectedFloor = ref(null);
 const roomsList = ref([]);
 const visibleBookingDialog = ref(false);
+
 const handleReset = () => {
     startDate.value = '';
     endDate.value = '';
@@ -32,7 +32,6 @@ const handleReset = () => {
 const dateFormatter = (data) => {
     const dateStr = data;
     const date = new Date(dateStr);
-
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-11
     const day = String(date.getDate()).padStart(2, '0');
@@ -46,7 +45,6 @@ const getRooms = async () => {
         console.log('Dates blocked');
         loading.value = false;
         return toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please Select Both Dates', group: 'br', life: 3000 });
-        
     }
     
     const token = useCookie('token');
@@ -60,6 +58,7 @@ const getRooms = async () => {
             }
         })
     );
+
     if (data.value?.length > 0) {
         const uniqueRooms = [];
         const roomMap = new Map();
@@ -92,6 +91,7 @@ const bookingData = ref({
     floor_id: '',
     floorName: ''
 });
+
 const showBookingDialog = (roomInfo) => {
     // console.log('Room Info', roomInfo);
     bookingData.value = {
@@ -102,11 +102,10 @@ const showBookingDialog = (roomInfo) => {
         price: roomInfo?.price_per_night,
         floor_id: roomInfo?.floor?.id,
         floorName: roomInfo?.floor?.name
-        
     };
-    console.log('Booking Data', bookingData.value);
-    visibleBookingDialog.value = true;
 
+    // console.log('Booking Data', bookingData.value);
+    visibleBookingDialog.value = true;
 };
 
 getFloors();
@@ -116,7 +115,6 @@ const closeCreateModal = (evn) => {
     getRooms();
 };
 
-
 onMounted(() => {
     console.log('Mounted', url);
 });
@@ -125,7 +123,6 @@ onMounted(() => {
 <template>
     <div class="main-wrapper">
         <AppTopbar />
-
         <div class="dash-banner">
             <div class="banner-content">
                 <!-- <pre>{{url.public.apiUrl}}</pre>
