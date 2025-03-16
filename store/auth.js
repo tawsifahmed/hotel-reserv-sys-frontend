@@ -10,6 +10,7 @@ export const useAuthStore = defineStore('auth', {
         resetState: null,
         resetToken: '',
         checkType: '',
+        errorMessage: '',
         cookieOptions: {
             maxAge: 60 * 60 * 24 * 3,
             priority: 'high',
@@ -32,9 +33,10 @@ export const useAuthStore = defineStore('auth', {
                     }
                 });
                 if (error.value) {
-                    if (error.value?.data?.code === 401) {
+                    if (error.value.data.code === 401) {
                         this.authenticated = false;
                         console.error('Authentication failed. Invalid credentials.');
+                        this.errorMessage = error.value.data.message;
                     }
                     return;
                 }

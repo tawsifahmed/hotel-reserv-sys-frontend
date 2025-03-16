@@ -155,7 +155,7 @@ initFilters();
 
             <Column field="name" header="Room No."></Column>
             <Column field="floor.name" header="Floor Layout"></Column>
-            <Column field="seats" header="No. of Seats"></Column>
+            <Column field="seats" header="Seat Capacity"></Column>
             <Column field="price_per_night" header="Price">
                 <template #body="slotProps"> 
                 <i>

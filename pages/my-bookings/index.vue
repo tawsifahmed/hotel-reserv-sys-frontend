@@ -8,8 +8,15 @@ definePageMeta({
     layout: 'false'
 });
 
+const bookingKey = useRoute().query.booking_key;
+
 const toast = useToast();
 const myBookingList = ref([]);
+const id = ref(null);
+const visibleDetailView = ref(false);
+const visibleDeleteFloor = ref(false);
+
+
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('userBookingList', () =>
@@ -23,8 +30,22 @@ const init = async () => {
         myBookingList.value = data.value?.map((item, index) => ({ ...item, index: index + 1 }));
     }
 };
-const id = ref(null);
-const visibleDeleteFloor = ref(false);
+
+const resSingleData = ref({});
+const initDetailView = async () => {
+    const token = useCookie('token');
+    const { data, pending, error } = await useAsyncData('userBookingList', () =>
+        $fetch(`${url.public.apiUrl}/api/v1/reservations/show/${id.value}`, {
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        })
+    );
+    if (data.value?.code === 200) {
+        resSingleData.value = data.value?.data;
+        console.log('resSingleData =>', resSingleData.value);
+    }
+};
 const deleteFloor = (key) => {
     visibleDeleteFloor.value = true;
     id.value = key;
@@ -41,7 +62,7 @@ const confirmDeleteFloor = async () => {
             Authorization: `Bearer ${token.value}`
         },
         body: {
-        status: 'cancelled',
+            status: 'cancelled'
         }
     });
 
@@ -49,7 +70,7 @@ const confirmDeleteFloor = async () => {
         visibleDeleteFloor.value = false;
         toast.add({ severity: 'success', summary: 'Success', detail: 'Floor deleted successfully!', group: 'br', life: 3000 });
         loading1.value = false;
-       
+
         init();
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Floor deleted Failed!', group: 'br', life: 3000 });
@@ -66,6 +87,26 @@ const dateFormatter = (data) => {
 
     return `${year}-${month}-${day}`;
 };
+
+const handleDetailView = async (key) => {
+    console.log('key =>', key);
+    id.value = key;
+    await initDetailView();
+    visibleDetailView.value = false;
+};
+
+watch(
+    () => useRoute().query.booking_key,
+    (newKey) => {
+        if (newKey) {
+            handleDetailView({ newKey });
+        }
+    }
+);
+
+if (bookingKey) {
+    handleDetailView({ bookingKey });
+}
 
 const tableLoader = ref(true);
 onMounted(async () => {
@@ -92,52 +133,65 @@ onMounted(async () => {
 
                 <Column field="room.name" header="Room Number">
                     <template #body="slotProps">
-                       <i>
-                           <b>Room No. {{slotProps.data.room.name}}</b>
-                       </i>
+                        <i>
+                            <b>Room No. {{ slotProps.data.room.name }}</b>
+                        </i>
                     </template>
-                   </Column>
-                <Column field="room.seats" header="Seats"></Column>
+                </Column>
+                <Column field="room.seats" header="Seat Capacity"></Column>
                 <Column field="room.floor.name" header="Floor Layout"></Column>
                 <Column field="start_date" header="Check In"></Column>
                 <Column field="end_date" header="Check Out"></Column>
                 <Column field="created_at" header="Booked At">
                     <template #body="slotProps">
-                       <p>
-                        {{dateFormatter(slotProps?.data?.created_at)}}
-                       </p>
-                     </template>
-                </Column>
-                <Column field="room.price_per_night" header="Price">
-                    <template #body="slotProps"> 
-                       <i>
-                           <b>$</b>{{slotProps.data.room.price_per_night }}
-                       </i>
-       
+                        <p>
+                            {{ dateFormatter(slotProps?.data?.created_at) }}
+                        </p>
                     </template>
-                   </Column>
+                </Column>
+                <Column field="total_price" header="Price">
+                    <template #body="slotProps">
+                        <i> <b>$</b>{{ slotProps.data.total_price }} </i>
+                    </template>
+                </Column>
                 <Column field="status" header="Status">
                     <template #body="slotProps">
-                        <span :class="{
-                            'bg-red-100 text-red-800': slotProps.data.status === 'cancelled',
-                            'bg-green-100 text-green-800': slotProps.data.status === 'confirmed',
-                            'bg-yellow-100 text-yellow-800': slotProps.data.status === 'pending'
-                        }" class="px-2 py-1 rounded" style="border-radius: 5px;">{{slotProps.data.status}}
-                    </span>
+                        <span
+                            :class="{
+                                'bg-red-100 text-red-800': slotProps.data.status === 'cancelled',
+                                'bg-green-100 text-green-800': slotProps.data.status === 'confirmed',
+                                'bg-yellow-100 text-yellow-800': slotProps.data.status === 'pending'
+                            }"
+                            class="px-2 py-1 rounded"
+                            style="border-radius: 5px"
+                            >{{ slotProps.data.status }}
+                        </span>
                     </template>
                 </Column>
                 <Column field="action" header="Action">
                     <template #body="slotProps">
-                        <Button :disabled="slotProps.data.status === 'cancelled' || slotProps.data.status === 'confirmed'" v-tooltip.top="{ value: 'Cancel reservation' }" icon="pi pi-times" text severity="danger" rounded @click="deleteFloor(slotProps.data.id)"/>
+                        <Button v-tooltip.top="{ value: 'View' }" icon="pi pi-window-maximize" text severity="info" rounded @click="handleDetailView(slotProps.data.id)" />
+                        <Button
+                            :disabled="slotProps.data.status === 'cancelled' || slotProps.data.status === 'confirmed'"
+                            v-tooltip.top="{ value: 'Cancel reservation' }"
+                            icon="pi pi-times"
+                            text
+                            severity="danger"
+                            rounded
+                            @click="deleteFloor(slotProps.data.id)"
+                        />
                     </template>
                 </Column>
             </DataTable>
             <Dialog v-model:visible="visibleDeleteFloor" header="Cancel Booking" dismissableMask="true" :style="{ width: '25rem' }">
-                <p>Are you sure you want to cancel ?</p>
+                <p>Are you sure you want to cancel?</p>
                 <Button label="No" icon="pi pi-times" text @click="visibleDeleteFloor = false" />
                 <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteFloor" :loading="loading1" />
             </Dialog>
             <Toast position="bottom-right" group="br" />
+            <Dialog v-model:visible="visibleDetailView" modal header="Reservation View" dismissableMask="true" :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+                <ReservationsDetailView :resSingleData="resSingleData" @closeEditModal="closeEditModal($event)" />
+            </Dialog>
         </div>
         <AppFooter />
     </div>

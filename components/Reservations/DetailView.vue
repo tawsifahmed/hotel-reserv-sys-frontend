@@ -1,26 +1,19 @@
 <script setup>
 const url = useRuntimeConfig();
-const toast = useToast();
-const props = defineProps({
-    param: {
-        type: Object,
-        required: true
-    }
+const { resSingleData } = defineProps(['resSingleData']);
+
+const selectedStatus = ref({
+    name: resSingleData.status.charAt(0).toUpperCase() + resSingleData.status.slice(1),
+    code: resSingleData.status
 });
 
-const bookingData = ref(props.param.bookingData);
+const statusList = ref([
+    { name: 'Pending', code: 'pending' },
+    // { name: 'Confirmed', code: 'confirmed' },
+    { name: 'Cancelled', code: 'cancelled' },
+])
+const toast = useToast();
 
-const dateDuration = ref(0);
-const totalPrice = ref();
-const getDateCountLength = () => {
-    const date1 = new Date(bookingData.value.start_date);
-    const date2 = new Date(bookingData.value.end_date);
-    const diffTime = date2 - date1;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Adding 1 to include both start and end dates
-    dateDuration.value = diffDays;
-    totalPrice.value = diffDays * bookingData.value.price;
-};
-getDateCountLength();
 const errorHandler = ref(false);
 
 const emit = defineEmits(['closeCreateModal']);
@@ -36,10 +29,10 @@ const handleSubmitData = async () => {
                 Authorization: `Bearer ${token.value}`
             },
             body: {
-                room_id: bookingData.value.room_id,
-                start_date: bookingData.value.start_date,
-                end_date: bookingData.value.end_date,
-                total_price: totalPrice.value
+                // room_id: bookingData.value.room_id,
+                // start_date: bookingData.value.start_date,
+                // end_date: bookingData.value.end_date,
+                // total_price: 200
                 // is_paid
             }
         });
@@ -60,51 +53,49 @@ const handleSubmitData = async () => {
 </script>
 <template>
     <div>
-        <!-- <pre>        {{ dateDuration }}</pre> -->
+        <pre>        {{ resSingleData }} </pre>
         <div class="field">
             <label>Room No.<i class="text-red-400 text-italic"></i> </label>
-            <InputText v-model="bookingData.roomName" class="w-full" disabled />
+            <InputText v-model="resSingleData.room.name" class="w-full" disabled />
         </div>
         <div class="field">
             <label>Check In<i class="text-red-400"></i> </label>
-            <InputText v-model="bookingData.start_date" class="w-full" disabled />
+            <InputText v-model="resSingleData.start_date" class="w-full" disabled />
         </div>
         <div class="field">
             <label>Check Out<i class="text-red-400"></i> </label>
-            <InputText v-model="bookingData.end_date" class="w-full" disabled />
-        </div>
-        <div class="field">
-            <label>Floor Layout<i class="text-red-400 text-italic"></i> </label>
-            <InputText v-model="bookingData.floorName" class="w-full" disabled />
+            <InputText v-model="resSingleData.end_date" class="w-full" disabled />
         </div>
         <div class="field">
             <label>Price per day<i class="text-red-400 text-italic"></i> </label>
             <InputGroup>
                 <InputGroupAddon>$</InputGroupAddon>
-                <InputNumber v-model="bookingData.price" disabled placeholder="Price" />
+                <InputNumber v-model="resSingleData.room.price_per_night" disabled placeholder="Price" />
             </InputGroup>
         </div>
         <div class="field">
             <label>Total Price <i class="text-red-700 text-italic text-xs">Calculated from date range</i> </label>
             <InputGroup>
                 <InputGroupAddon>$</InputGroupAddon>
-                <InputNumber v-model="totalPrice" disabled placeholder="Price" />
+                <InputNumber  disabled placeholder="Price" />
             </InputGroup>
         </div>
         <div class="mt-2 mb-3" style="border: 1px solid #e0e0e0; margin-top: 20px; padding: 15px; border-radius: 5px">
             <label class="my-2 text-xl font-bold">Customer Details<i class="text-red-400 text-italic"></i> </label>
             <div class="field mt-2">
                 <label>Name<i class="text-red-400 text-italic"></i> </label>
-                <InputText v-model="bookingData.userData.data.name" class="w-full" disabled />
+                <InputText  class="w-full" disabled />
             </div>
             <div class="field">
                 <label>Email<i class="text-red-400 text-italic"></i> </label>
-                <InputText v-model="bookingData.userData.data.email" class="w-full" disabled />
+                <InputText  class="w-full" disabled />
             </div>
         </div>
-        <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
-        <div class="create-btn-wrapper mb-0">
-            <Button :loading="loading" label="Confirm Reservation" @click="handleSubmitData" />
+        <div class="user-selection w-full md:w-14rem w-full">
+            <label class="font-bold block mb-2">Booking Status:</label>
+            <div class="flex justify-content-center">
+                <Dropdown display="chip" v-model="selectedStatus" :options="statusList" filter resetFilterOnHide optionLabel="name" placeholder="Select Status (Optional)" class="w-full" />
+            </div>
         </div>
     </div>
 </template>

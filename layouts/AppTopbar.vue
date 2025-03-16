@@ -98,7 +98,9 @@ const vClickOutside = {
 
 onUnmounted(() => {
     const element = document.querySelector('.relative');
-    vClickOutside?.unmounted(element);
+    if(element){
+        vClickOutside?.unmounted(element);
+    }
 });
 
 
@@ -188,27 +190,10 @@ onMounted(() => {
 
 getUserData();
 
-const handleRefresh = async(route) => {
-    if(route === 'admin'){
-        await navigateTo({ path: `/admin-dashboard` });
-        return location.reload();
-    }
-    if(route === 'booking'){
-        await navigateTo({ path: `/my-booking` });
-        return location.reload();
-    }
-    if(route === 'home'){
-        await navigateTo({ path: `/` });
-        return location.reload();
-    }
-
-
-    
-}
 const logout = () => {
     logUserOut();
     router.push('/login');
-    location.reload();
+    // location.reload();
 };
 </script>
 
@@ -241,16 +226,16 @@ const logout = () => {
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
             <div>
-                <NuxtLink @click="handleRefresh('home')" v-if="showAdminRoute === true" to="/" class="p-link layout-topbar-button mr-5 modified-link">
+                <NuxtLink v-if="showAdminRoute === true" to="/" class="p-link layout-topbar-button mr-5 modified-link">
                     <h5 class="text-nowrap mb-0 m-links">Client Site</h5>
                     <span>Client Site</span>
                 </NuxtLink>
-                <NuxtLink @click="handleRefresh('admin')" v-if="showClientRoute === true" to="/admin-dashboard" class="p-link layout-topbar-button mr-5 modified-link" style="margin-right: 95px !important;">
+                <NuxtLink v-if="showClientRoute === true" to="/admin-dashboard" class="p-link layout-topbar-button mr-5 modified-link" style="margin-right: 95px !important;">
                     <h5 class="text-nowrap mb-0 m-links">Admin Dashboard</h5>
                     <span>Admin Dashboard</span>
                 </NuxtLink>
             </div>
-            <NuxtLink @click="handleRefresh('bookings')" v-if="isClient === true" to="/my-bookings" class="p-link layout-topbar-button mr-5 modified-link">
+            <NuxtLink v-if="isClient === true" to="/my-bookings" class="p-link layout-topbar-button mr-5 modified-link">
                 <h5 class="text-nowrap mb-0" :class="isMyBookingsRoute === true ? 'font-bold underline' : ''">My Bookings</h5>
                 <span>My Bookings</span>
             </NuxtLink>

@@ -4,7 +4,10 @@ import AppFooter from '../layouts/AppFooter.vue';
 import { onMounted } from 'vue';
 import { useFloorStore } from '~/store/floors';
 import { storeToRefs } from 'pinia';
+import { useUserStore } from '~/store/user';
 
+const { getUserData } = useUserStore();
+const { userProfile } = storeToRefs(useUserStore());
 const { getFloors } = useFloorStore();
 const { floorList } = storeToRefs(useFloorStore());
 const url = useRuntimeConfig();
@@ -46,6 +49,12 @@ const getRooms = async () => {
         loading.value = false;
         return toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please Select Both Dates', group: 'br', life: 3000 });
     }
+
+    if (new Date(endDate.value) < new Date(startDate.value)) {
+        console.log('Invalid date range');
+        loading.value = false;
+        return toast.add({ severity: 'warn', summary: 'Warning', detail: 'Check out date must be equal to or after Check in date', group: 'br', life: 3000 });
+    }
     
     const token = useCookie('token');
     const formattedStartDate = dateFormatter(startDate.value);
@@ -61,12 +70,14 @@ const getRooms = async () => {
 
     if (data.value?.length > 0) {
         roomsList.value = data.value?.map((item, index) => ({ ...item, index: index + 1 }));
+        getUserData();
         loading.value = false;
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'No rooms available!', group: 'br', life: 3000 });
         loading.value = false;
     }
 };
+
 
 const bookingData = ref({
     room_id: '',
@@ -87,7 +98,8 @@ const showBookingDialog = (roomInfo) => {
         end_date: dateFormatter(endDate.value),
         price: roomInfo?.price_per_night,
         floor_id: roomInfo?.floor?.id,
-        floorName: roomInfo?.floor?.name
+        floorName: roomInfo?.floor?.name,
+        userData: userProfile.value
     };
 
     // console.log('Booking Data', bookingData.value);
@@ -168,7 +180,7 @@ onMounted(() => {
                                     <br />
                                     <i class="">{{ room.floor?.name }}</i>
                                 </h6>
-                                <Button @click="showBookingDialog(room)" label="Book" severity="primary" class="ml-4 mt-5" size="large" style="width: 120px; position: absolute; top: 90px;" />
+                                <Button @click="showBookingDialog(room)" label="Reserve" severity="primary" class="ml-4 mt-5" size="large" style="width: 120px; position: absolute; top: 90px;" />
                             </div>
                         </div>
                     </div>

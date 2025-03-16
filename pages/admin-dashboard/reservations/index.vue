@@ -139,7 +139,7 @@ initFilters();
                 </i>
              </template>
             </Column>
-            <Column field="room.seats" header="Seats"></Column>
+            <Column field="room.seats" header="Seat Capacity"></Column>
             <Column field="room.floor.name" header="Floor Layout"></Column>
             <Column field="start_date" header="Check In"></Column>
             <Column field="end_date" header="Check Out"></Column>
@@ -150,10 +150,10 @@ initFilters();
                    </p>
                  </template>
             </Column>
-            <Column field="room.price_per_night" header="Price">
+            <Column field="room.price_per_night" header="Total Price">
              <template #body="slotProps"> 
                 <i>
-                    <b>$</b>{{slotProps.data.room.price_per_night }}
+                    <b>$</b>{{slotProps.data?.total_price }}
                 </i>
 
              </template>

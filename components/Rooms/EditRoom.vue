@@ -76,7 +76,7 @@ const handleSubmitData = async () => {
             <Dropdown v-model="selectedFloor" :options="floorList" filter resetFilterOnHide optionLabel="name" placeholder="Select Floor" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
         <div class="field flex flex-column seat-no">
-            <label for="company">No. of Seats<i class="text-red-400 text-italic">*</i> </label>
+            <label for="company">Seat Capacity<i class="text-red-400 text-italic">*</i> </label>
             <InputNumber v-model="seatNo" showButtons buttonLayout="horizontal" style="width: 100%; text-align: center" :min="1" :max="99">
                 <template #incrementbuttonicon>
                     <span class="pi pi-plus" />
