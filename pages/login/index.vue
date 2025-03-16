@@ -28,7 +28,7 @@ const forgotOtp = ref('');
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useAuthStore } from '~/store/auth'; // import the auth store we just created
 const { authenticateUser, otpVerify, resendOtp, forgotPassword, forgotPasswordOtp, passwordReset } = useAuthStore(); // use authenticateUser action from  auth store
-const { authenticated, checkOTP, resendOtpResponse, resendOtpMsg, authOtp, checkType } = storeToRefs(useAuthStore());
+const { authenticated, errorMessage, resendOtpResponse, resendOtpMsg, authOtp, checkType } = storeToRefs(useAuthStore());
 
 import Checkbox from 'primevue/checkbox';
 import RadioButton from 'primevue/radiobutton';
@@ -104,7 +104,7 @@ const handleLoginSubmit = async () => {
             }
             }, 450);
         } else {
-            toast.add({ severity: 'error', summary: 'Authorization Failed!', detail: 'Invalid email or password', group: 'br', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Authorization Failed!', detail: `${errorMessage.value}`, group: 'br', life: 3000 });
         }
         loginBtnHandle.value = false;
     }
