@@ -257,6 +257,12 @@ onMounted(() => {
                     <div class="flex flex-wrap items-center justify-between mt-4">
                         Don't have an account?&nbsp; <NuxtLink to="/register" class="forgot_pass md:mb-0"> Click Here</NuxtLink>
                     </div>
+
+                    <ul class="absolute mt-4">
+                        <li>API is configured in project root directory: <i>/utils/apiLink.js</i> </li>
+                        <li>Default given api link: http://127.0.0.1:8000</li>
+                    
+                    </ul>
                 </div>
                 <div v-if="resetForm == 'email'" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">

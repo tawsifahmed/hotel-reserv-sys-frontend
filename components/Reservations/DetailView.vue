@@ -23,7 +23,7 @@ const bookingData = ref({
     type: resSingleData?.type
 });
 const selectedStatus = ref({
-    name: resSingleData?.status === 'cancelled' ? 'Cancel' : resSingleData?.status === 'confirmed' ? 'Confirm' : resSingleData?.status === 'pending' ? 'Pending' : resSingleData?.status.charAt(0).toUpperCase() + resSingleData?.status?.slice(1),
+    name: resSingleData?.status === 'cancelled' ? 'Cancelled' : resSingleData?.status === 'confirmed' ? 'Confirmed' : resSingleData?.status === 'pending' ? 'Pending' : resSingleData?.status.charAt(0).toUpperCase() + resSingleData?.status?.slice(1),
     code: resSingleData?.status
 });
 
@@ -41,11 +41,11 @@ const statusList = ref([
 ])
 if(resSingleData.type === 'client' && resSingleData?.status === 'pending'){
     statusList.value.push({ name: 'Pending', code: 'pending' });
-    statusList.value.push({ name: 'Cancel', code: 'cancelled' });
+    statusList.value.push({ name: 'Cancelled', code: 'cancelled' });
 }else{
     statusList.value.push({ name: 'Pending', code: 'pending' });
-    statusList.value.push({ name: 'Confirm', code: 'confirmed' });
-    statusList.value.push({ name: 'Cancel', code: 'cancelled' });
+    statusList.value.push({ name: 'Confirmed', code: 'confirmed' });
+    statusList.value.push({ name: 'Cancelled', code: 'cancelled' });
 }
 
 
@@ -113,7 +113,7 @@ const handleSubmitData = async () => {
             </InputGroup>
         </div>
         <div class="mt-2 mb-3" style="border: 1px solid #e0e0e0; margin-top: 20px; padding: 15px; border-radius: 5px">
-            <label class="my-2 text-xl font-bold">Customer Details<i class="text-red-400 text-italic"></i> </label>
+            <label class="my-2 text-xl font-bold">Customer Details:<i class="text-red-400 text-italic mb-2"></i> </label>
             <div class="field mt-2">
                 <label>Name<i class="text-red-400 text-italic"></i> </label>
                 <InputText v-model="bookingData.user.name" class="w-full" disabled />
@@ -129,10 +129,19 @@ const handleSubmitData = async () => {
                 <Dropdown     :disabled="(bookingData.status === 'cancelled' || bookingData.status === 'confirmed') && bookingData.type === 'client'" display="chip" v-model="selectedStatus" :options="statusList" filter resetFilterOnHide optionLabel="name" placeholder="Select Status" class="w-full" />
             </div>
         </div>
-        <div class=" justify-content-center align-items-center w-full my-3">
-            <p class="mb-0" v-if="(bookingData.status === 'cancelled' || bookingData.status === 'confirmed') && bookingData.type === 'client'" style="color: red; text-align:center;">Your reservation has been {{bookingData.status}}.</p>
-             <p v-if="bookingData.status === 'cancelled' && bookingData.type === 'client'" style="color: red; text-align:center;"> You cannot update this reservation anymore.</p>
+        <div class="justify-content-center align-items-center w-full my-3">
+            <p class="mb-0"
+                v-if="(bookingData.status === 'cancelled' || bookingData.status === 'confirmed') && bookingData.type === 'client'"
+                :style="{ color: bookingData.status === 'cancelled' ? 'red' : 'green', textAlign: 'center' }"
+            >
+                Your reservation has been {{ bookingData.status }}.
+            </p>
+            <p v-if="bookingData.status === 'cancelled' && bookingData.type === 'client'" style="color: red; text-align: center;"
+            >
+                You cannot update this reservation anymore.
+            </p>
         </div>
+        
         <div class="create-btn-wrapper mb-0">
             <Button :loading="loading" label="Update Reservation" @click="handleSubmitData" :disabled="!statusChanged" />
         </div>

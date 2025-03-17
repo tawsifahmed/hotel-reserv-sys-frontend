@@ -3,13 +3,13 @@ import accessPermission from '~/composables/userTypeChecker';
 import { FilterMatchMode } from 'primevue/api';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
-import { useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 
 const url = useRuntimeConfig();
 const toast = useToast();
 const isAdmin = ref(accessPermission('admin'));
 
-const bookingKey = ref(useRoute().query.booking_key);
+// const bookingKey = ref(useRoute().query.booking_key);
 
 definePageMeta({
     middleware: 'auth',
@@ -20,7 +20,7 @@ const reservationsList = ref([]);
 const filters = ref();
 const loading = ref(true);
 const loading1 = ref(false);
-const visibleDeleteTag = ref(false);
+const visibleConfirmModal = ref(false);
 
 const id = ref('');
 const actionType = ref(null);
@@ -32,18 +32,16 @@ const actionOnRsrv = (key, type) => {
         actionType.value = 'pending'
         actionModalMsg.value = type
     }
-    
     if(type === 'approve'){
         actionType.value = 'confirmed'
         actionModalMsg.value = type
     }
-    
     if(type === 'cancel'){
         actionType.value = 'cancelled'
         actionModalMsg.value = type
     }
     
-    visibleDeleteTag.value = true;
+    visibleConfirmModal.value = true;
 };
 
 const visibleDetailView = ref(false);
@@ -70,9 +68,7 @@ const initDetailView = async (key) => {
     }
 };
 
-
-
-const confirmDeleteTag = async () => {
+const confirmUpdate = async () => {
     loading1.value = true;
     const token = useCookie('token');
     const { data, pending } = await useFetch(`${url.public.apiUrl}/api/v1/reservations/update/${id.value}`, {
@@ -86,7 +82,7 @@ const confirmDeleteTag = async () => {
     });
 
     if (data.value.code === 200) {
-        visibleDeleteTag.value = false;
+        visibleConfirmModal.value = false;
         toast.add({ severity: 'success', summary: 'Success', detail: `Reservation status is ${actionType.value}!`, group: 'br', life: 3000 });
         loading1.value = false;
        
@@ -116,26 +112,27 @@ const initFilters = () => {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS }
     };
 };
+initFilters();
 
 const dateFormatter = (data) => {
     const dateStr = data;
     const date = new Date(dateStr);
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-11
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
 };
 
-const handleDetailView = async (key) => {
-    console.log('key =>', key);
-    
+const handleDetailView = async (key) => {    
     await initDetailView(key);
     visibleDetailView.value = true;
 };
 
+
+const router = ref(useRouter().currentRoute);
 watch(
-    () => bookingKey.value,
+    () => router.value.query?.booking_key,
     (newKey) => {
         if (newKey) {
             handleDetailView(newKey);
@@ -143,8 +140,8 @@ watch(
     }
 );
 
-if (bookingKey.value) {
-    handleDetailView(bookingKey.value);
+if (router.value.query?.booking_key) {
+    handleDetailView(router.value.query?.booking_key);
 }
 
 onMounted(() => {
@@ -154,14 +151,13 @@ onMounted(() => {
     }
     loading.value = false;
 });
-
-initFilters();
 </script>
 
 <template>
     <div class="card">
         <div class="d-flex mr-2">
             <h5 class="mb-1">Reservation List</h5>
+         <!-- <pre>  dd {{ router.query }}</pre> -->
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
@@ -230,15 +226,10 @@ initFilters();
             </Column>
         </DataTable>
 
-        <!-- Create -->
-        <Dialog v-model:visible="visibleCreateTag" modal header="Create Tag" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TagsCreateTag @closeCreateModal="closeCreateModal($event)" />
-        </Dialog>
-
-        <Dialog v-model:visible="visibleDeleteTag" :header="actionModalMsg?.charAt(0).toUpperCase() + actionModalMsg?.slice(1)" dismissableMask="true" :style="{ width: '25rem' }">
+        <Dialog v-model:visible="visibleConfirmModal" :header="actionModalMsg?.charAt(0).toUpperCase() + actionModalMsg?.slice(1)" dismissableMask="true" :style="{ width: '25rem' }">
             <p>Are you sure you want to <span> <b>{{actionModalMsg}}</b> </span> this reservation?</p>
-            <Button label="No" icon="pi pi-times" text @click="visibleDeleteTag = false" />
-            <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteTag" :loading="loading1" />
+            <Button label="No" icon="pi pi-times" text @click="visibleConfirmModal = false" />
+            <Button label="Yes" icon="pi pi-check" text @click="confirmUpdate" :loading="loading1" />
         </Dialog>
 
         <Dialog v-model:visible="visibleDetailView" modal header="Reservation View" dismissableMask="true" :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">

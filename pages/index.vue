@@ -29,6 +29,7 @@ const handleReset = () => {
     startDate.value = '';
     endDate.value = '';
     selectedFloor.value = '';
+    dateDuration.value = 0;
     roomsList.value = [];
 };
 
@@ -40,6 +41,15 @@ const dateFormatter = (data) => {
     const day = String(date.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
+};
+
+
+// date duration to calculate total price for booking
+const dateDuration = ref(0);
+const getDateCountLength = () => {
+    const diffTime = endDate.value - startDate.value;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    dateDuration.value = diffDays;
 };
 
 const getRooms = async () => {
@@ -71,6 +81,7 @@ const getRooms = async () => {
     if (data.value?.length > 0) {
         roomsList.value = data.value?.map((item, index) => ({ ...item, index: index + 1 }));
         getUserData();
+        getDateCountLength();
         loading.value = false;
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'No rooms available!', group: 'br', life: 3000 });
@@ -157,33 +168,43 @@ onMounted(() => {
         <div class="dash">
             <h5 v-if="roomsList?.length > 0" class="text-start mb-3 ml-2" style="text-decoration: underline">Available Rooms: {{ roomsList?.length }}</h5>
             <div class="grid container mt-3 pt-10 flex flex-wrap justify-content-center align-items-center gap-5">
-                <div v-for="room in roomsList" :key="room" class="">
-                    <div class="mb-0 room-card">
-                        <div>
-                            <div class="bg-primary-800 w-fit px-2 py-1 room-title">
-                                <h4 v-tooltip.top="{ value: `Room no.: ${room?.name}` }" class="text-white text-center mb-0">
-                                    Room No.
-                                    <br />
-                                    <i class="trunc-text">{{ room?.name }}</i>
-                                </h4>
-                            </div>
-
-                            <div class="seats-info">
-                                <b>Total Seats: {{ room?.seats }}</b>
-
-                                <h5 class="m-0 mb-1">
-                                    <b class="price-info"> Price: ${{ room?.price_per_night }} </b>
-                                </h5>
-
-                                <h6 v-tooltip.left="{ value: `Layout: ${room?.floor?.name}` }" class="m-0 mb-3 layout-info">
-                                    <u>Layout:</u>
-                                    <br />
-                                    <i class="">{{ room.floor?.name }}</i>
-                                </h6>
-                                <Button @click="showBookingDialog(room)" label="Reserve" severity="primary" class="ml-4 mt-5" size="large" style="width: 120px; position: absolute; top: 90px;" />
+                <div v-if="roomsList?.length > 0">
+                    <div v-for="room in roomsList" :key="room" class="">
+                        <div class="mb-0 room-card">
+                            <div>
+                                <div class="bg-primary-800 w-fit px-2 py-1 room-title">
+                                    <h4 v-tooltip.top="{ value: `Room no.: ${room?.name}` }" class="text-white text-center mb-0">
+                                        Room No.
+                                        <br />
+                                        <i class="trunc-text">{{ room?.name }}</i>
+                                    </h4>
+                                </div>
+    
+                                <div class="seats-info">
+                                    <b>Total Seats: {{ room?.seats }}</b>
+    
+                                    <h5 class="m-0 mb-1">
+                                        <b class="price-info"> Price: ${{ room?.price_per_night * dateDuration }} </b>
+                                    </h5>
+    
+                                    <h6 v-tooltip.left="{ value: `Layout: ${room?.floor?.name}` }" class="m-0 mb-3 layout-info">
+                                        <u>Layout:</u>
+                                        <br />
+                                        <i class="">{{ room.floor?.name }}</i>
+                                    </h6>
+                                    <Button @click="showBookingDialog(room)" label="Reserve" severity="primary" class="ml-4 mt-5" size="large" style="width: 120px; position: absolute; top: 90px;" />
+                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="text-xl" v-else>
+                    <!-- <ul>
+                        <li>API  is configured in project root directory: <i>/utils/apiLink.js</i> </li>
+                        <li>Default given api link: </li>
+                        <li></li>
+                        <li></li>
+                    </ul> -->
                 </div>
             </div>
         </div>

@@ -15,7 +15,7 @@ const getDateCountLength = () => {
     const date1 = new Date(bookingData.value.start_date);
     const date2 = new Date(bookingData.value.end_date);
     const diffTime = date2 - date1;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Adding 1 to include both start and end dates
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
     dateDuration.value = diffDays;
     totalPrice.value = diffDays * bookingData.value.price;
 };

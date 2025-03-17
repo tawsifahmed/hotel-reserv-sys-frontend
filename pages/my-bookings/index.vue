@@ -100,7 +100,7 @@ const handleDetailView = async (key) => {
 };
 
 watch(
-    () => useRoute().query.booking_key,
+    () => useRoute().query?.booking_key,
     (newKey) => {
         if (newKey) {
             handleDetailView(newKey);
@@ -108,8 +108,8 @@ watch(
     }
 );
 
-if (useRoute().query.booking_key) {
-    handleDetailView(useRoute().query.booking_key);
+if (useRoute().query?.booking_key) {
+    handleDetailView(useRoute().query?.booking_key);
 }
 
 const tableLoader = ref(true);
