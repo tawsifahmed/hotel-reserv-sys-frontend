@@ -168,43 +168,33 @@ onMounted(() => {
         <div class="dash">
             <h5 v-if="roomsList?.length > 0" class="text-start mb-3 ml-2" style="text-decoration: underline">Available Rooms: {{ roomsList?.length }}</h5>
             <div class="grid container mt-3 pt-10 flex flex-wrap justify-content-center align-items-center gap-5">
-                <div v-if="roomsList?.length > 0">
-                    <div v-for="room in roomsList" :key="room" class="">
-                        <div class="mb-0 room-card">
-                            <div>
-                                <div class="bg-primary-800 w-fit px-2 py-1 room-title">
-                                    <h4 v-tooltip.top="{ value: `Room no.: ${room?.name}` }" class="text-white text-center mb-0">
-                                        Room No.
-                                        <br />
-                                        <i class="trunc-text">{{ room?.name }}</i>
-                                    </h4>
-                                </div>
-    
-                                <div class="seats-info">
-                                    <b>Total Seats: {{ room?.seats }}</b>
-    
-                                    <h5 class="m-0 mb-1">
-                                        <b class="price-info"> Price: ${{ room?.price_per_night * dateDuration }} </b>
-                                    </h5>
-    
-                                    <h6 v-tooltip.left="{ value: `Layout: ${room?.floor?.name}` }" class="m-0 mb-3 layout-info">
-                                        <u>Layout:</u>
-                                        <br />
-                                        <i class="">{{ room.floor?.name }}</i>
-                                    </h6>
-                                    <Button @click="showBookingDialog(room)" label="Reserve" severity="primary" class="ml-4 mt-5" size="large" style="width: 120px; position: absolute; top: 90px;" />
-                                </div>
+                <div v-for="room in roomsList" :key="room" class="">
+                    <div class="mb-0 room-card">
+                        <div>
+                            <div class="bg-primary-800 w-fit px-2 py-1 room-title">
+                                <h4 v-tooltip.top="{ value: `Room no.: ${room?.name}` }" class="text-white text-center mb-0">
+                                    Room No.
+                                    <br />
+                                    <i class="trunc-text">{{ room?.name }}</i>
+                                </h4>
+                            </div>
+
+                            <div class="seats-info">
+                                <b>Total Seats: {{ room?.seats }}</b>
+
+                                <h5 class="m-0 mb-1">
+                                    <b class="price-info"> Price: ${{ room?.price_per_night * dateDuration }} </b>
+                                </h5>
+
+                                <h6 v-tooltip.left="{ value: `Layout: ${room?.floor?.name}` }" class="m-0 mb-3 layout-info">
+                                    <u>Layout:</u>
+                                    <br />
+                                    <i class="">{{ room.floor?.name }}</i>
+                                </h6>
+                                <Button @click="showBookingDialog(room)" label="Reserve" severity="primary" class="ml-4 mt-5" size="large" style="width: 120px; position: absolute; top: 90px;" />
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="text-xl" v-else>
-                    <!-- <ul>
-                        <li>API  is configured in project root directory: <i>/utils/apiLink.js</i> </li>
-                        <li>Default given api link: </li>
-                        <li></li>
-                        <li></li>
-                    </ul> -->
                 </div>
             </div>
         </div>
