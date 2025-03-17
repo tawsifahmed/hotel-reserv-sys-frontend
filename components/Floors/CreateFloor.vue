@@ -54,7 +54,7 @@ onMounted(() => {
             <label for="company"
                 >Floor Layout<i class="text-red-400 text-italic">*</i> 
             </label>
-            <InputText id="createFloorName" v-model="name" class="w-full" placeholder="S floor name" />
+            <InputText id="createFloorName" v-model="name" class="w-full" placeholder="Ex: Lvl 1 - Semi-Bedroom; Lvl 2 - Master Bedroom" />
         </div>
 
         <p v-if="errorHandler" style="color: red">Please enter floor name</p>

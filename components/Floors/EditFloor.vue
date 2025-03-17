@@ -61,7 +61,7 @@ onMounted(() => {
     <div>
         <div class="field">
             <label for="company">Name<i class="text-red-400 text-italic">*</i> </label>
-            <InputText id="editFloorName" v-model="name" class="w-full" placeholder="Edit floor name" />
+            <InputText id="editFloorName" v-model="name" class="w-full" placeholder="Ex: Lvl 1 - Semi-Bedroom; Lvl 2 - Master Bedroom" />
         </div>
 
         <p v-if="errorHandler" style="color: red">Please enter floor name</p>

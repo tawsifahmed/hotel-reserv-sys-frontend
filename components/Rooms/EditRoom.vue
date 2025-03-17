@@ -69,7 +69,7 @@ const handleSubmitData = async () => {
         <!-- {{seatNo}} -->
         <div class="field flex flex-column">
             <label>Room No.<i class="text-red-400 text-italic">*</i> </label>
-            <InputNumber v-model="roomNo" :min="1" inputId="withoutgrouping" :useGrouping="false" />
+            <InputNumber v-model="roomNo" :min="1" placeholder="Ex: 101, 204, 310, 4001" inputId="withoutgrouping" :useGrouping="false" />
         </div>
         <div class="field flex flex-column">
             <label>Floor Layout<i class="text-red-500">*</i></label>
@@ -89,9 +89,9 @@ const handleSubmitData = async () => {
         <div class="field flex flex-column">
             <!-- {{ selectedFloor }} -->
             <label for="company">Price<i class="text-red-400 text-italic">*</i> </label>
-            <InputNumber class="w-full" v-model="roomPrice" buttonLayout="horizontal" placeholder="Set room price" min="1" showButtons mode="currency" currency="USD" />
+            <InputNumber class="w-full" v-model="roomPrice" buttonLayout="horizontal" placeholder="Ex: $100, $200, $320, $400" min="1" showButtons mode="currency" currency="USD" />
         </div>
-        <p v-if="errorHandler" style="color: red">Please enter tag name</p>
+        <p v-if="errorHandler" style="color: red">Please fill up all the fields.</p>
         <div class="create-btn-wrappe">
             <Button label="Update" icon="pi pi-check" text="" @click="handleSubmitData" :loading="loading" />
         </div>

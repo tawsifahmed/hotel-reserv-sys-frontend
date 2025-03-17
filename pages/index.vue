@@ -141,7 +141,7 @@ onMounted(() => {
             </div>
             <Toolbar class="border-0 px-0 flex align-items-end mt-5" style="background-color: transparent; border: none; position: relative; top: 0px;">
                 <template #start>
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap gap-2">
                         <div class="flex-auto">
                             <label for="icondisplay" class="font-bold block mb-2 dash-labels">Check In: </label>
                             <Calendar v-model="startDate" showIcon iconDisplay="input" inputId="icondisplay" placeholder="From" />
