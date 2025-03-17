@@ -85,6 +85,7 @@ const getRooms = async () => {
         loading.value = false;
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'No rooms available!', group: 'br', life: 3000 });
+        roomsList.value = [];
         loading.value = false;
     }
 };
