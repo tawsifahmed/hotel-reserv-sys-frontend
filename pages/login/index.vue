@@ -276,6 +276,8 @@ onMounted(() => {
                     <div class="text-center mb-5">
                         <img src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
                         <div data-v-d804f83c="" class="text-900 text-3xl font-medium mt-1 mb-3">Verify OTP</div>
+                        <span v-tooltip.right="{ value: 'Default OTP is -- `123456` for testing purpose.' }" class="pi pi-info-circle cursor-pointer text-red-500 text-lg instruction-tip"> View</span>
+
                     </div>
                     <form @submit.prevent="forgotOtpHandler">
                         <!-- <div class="field md:w-28rem mb-4">

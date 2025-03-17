@@ -7,9 +7,8 @@ const props = defineProps({
         required: true
     }
 });
-
+const visibleFinalConfirm = ref(false);
 const bookingData = ref(props.param.bookingData);
-
 const dateDuration = ref(0);
 const totalPrice = ref();
 const getDateCountLength = () => {
@@ -104,8 +103,14 @@ const handleSubmitData = async () => {
         </div>
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
         <div class="create-btn-wrapper mb-0">
-            <Button :loading="loading" label="Confirm Reservation" @click="handleSubmitData" />
+            <Button label="Confirm Reservation" @click="visibleFinalConfirm = true" />
         </div>
+
+        <Dialog v-model:visible="visibleFinalConfirm" header=" " modal dismissableMask="true" :style="{ width: '25rem' }">
+            <p>Are you sure you want to confirm?</p>
+            <Button label="No" icon="pi pi-times" text @click="visibleFinalConfirm = false" />
+            <Button label="Yes" icon="pi pi-check" text @click="handleSubmitData" :loading="loading" />
+        </Dialog>
     </div>
 </template>
 <style lang="scss" scoped>

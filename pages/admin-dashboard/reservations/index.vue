@@ -3,10 +3,14 @@ import accessPermission from '~/composables/userTypeChecker';
 import { FilterMatchMode } from 'primevue/api';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
+import { useRoute } from 'vue-router';
 
 const url = useRuntimeConfig();
 const toast = useToast();
 const isAdmin = ref(accessPermission('admin'));
+
+const bookingKey = ref(useRoute().query.booking_key);
+
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
@@ -41,6 +45,32 @@ const actionOnRsrv = (key, type) => {
     
     visibleDeleteTag.value = true;
 };
+
+const visibleDetailView = ref(false);
+
+const resSingleData = ref({});
+
+const closeEditModal = (evn) => {
+    visibleDetailView.value = false;
+    init();
+};
+
+const initDetailView = async (key) => {
+    const token = useCookie('token');
+    const { data, pending, error } = await useAsyncData('resView', () =>
+        $fetch(`${url.public.apiUrl}/api/v1/reservations/show/${key}`, {
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        })
+    );
+    console.log('data check =>', data.value);
+    if (data.value.code === 200) {
+        resSingleData.value = { ...data.value?.data, type: 'admin' };
+    }
+};
+
+
 
 const confirmDeleteTag = async () => {
     loading1.value = true;
@@ -96,6 +126,26 @@ const dateFormatter = (data) => {
 
     return `${year}-${month}-${day}`;
 };
+
+const handleDetailView = async (key) => {
+    console.log('key =>', key);
+    
+    await initDetailView(key);
+    visibleDetailView.value = true;
+};
+
+watch(
+    () => bookingKey.value,
+    (newKey) => {
+        if (newKey) {
+            handleDetailView(newKey);
+        }
+    }
+);
+
+if (bookingKey.value) {
+    handleDetailView(bookingKey.value);
+}
 
 onMounted(() => {
     init();
@@ -171,6 +221,7 @@ initFilters();
             </Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">
+                    <Button v-tooltip.top="{ value: 'View' }" icon="pi pi-window-maximize" text severity="info" rounded @click="handleDetailView(slotProps.data.id)" />
                     <Button :disabled="slotProps.data.status === 'confirmed'" v-tooltip.top="{ value: 'Approve reservation' }" icon="pi pi-check" text class="" severity="success" rounded @click="actionOnRsrv(slotProps.data.id, 'approve')" />
                     <Button :disabled="slotProps.data.status === 'pending'"  v-tooltip.top="{ value: 'Hold reservation' }" icon="pi pi-undo" text class="" severity="secondary" rounded @click="actionOnRsrv(slotProps.data.id, 'hold')" />
                     <Button :disabled="slotProps.data.status === 'cancelled'" v-tooltip.top="{ value: 'Cancel reservation' }" icon="pi pi-times" text severity="danger" rounded @click="actionOnRsrv(slotProps.data.id, 'cancel')"/>
@@ -190,7 +241,9 @@ initFilters();
             <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteTag" :loading="loading1" />
         </Dialog>
 
-        <!-- Invite User -->
+        <Dialog v-model:visible="visibleDetailView" modal header="Reservation View" dismissableMask="true" :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <ReservationsDetailView :resSingleData="resSingleData" @closeEditModal="closeEditModal($event)" />
+        </Dialog>
         <Toast position="bottom-right" group="br" />
     </div>
 </template>

@@ -16,7 +16,6 @@ const id = ref(null);
 const visibleDetailView = ref(false);
 const visibleDeleteFloor = ref(false);
 
-
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('userBookingList', () =>
@@ -32,23 +31,28 @@ const init = async () => {
 };
 
 const resSingleData = ref({});
-const initDetailView = async () => {
+
+const initDetailView = async (key) => {
     const token = useCookie('token');
-    const { data, pending, error } = await useAsyncData('userBookingList', () =>
-        $fetch(`${url.public.apiUrl}/api/v1/reservations/show/${id.value}`, {
+    const { data, pending, error } = await useAsyncData('bookingView', () =>
+        $fetch(`${url.public.apiUrl}/api/v1/reservations/show/${key}`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
         })
     );
-    if (data.value?.code === 200) {
-        resSingleData.value = data.value?.data;
-        console.log('resSingleData =>', resSingleData.value);
+    if (data.value.code === 200) {
+        resSingleData.value = { ...data.value?.data, type: 'client' };
     }
 };
 const deleteFloor = (key) => {
     visibleDeleteFloor.value = true;
     id.value = key;
+};
+
+const closeEditModal = (evn) => {
+    visibleDetailView.value = false;
+    init();
 };
 
 const loading1 = ref(false);
@@ -90,22 +94,22 @@ const dateFormatter = (data) => {
 
 const handleDetailView = async (key) => {
     console.log('key =>', key);
-    id.value = key;
-    await initDetailView();
-    visibleDetailView.value = false;
+    
+    await initDetailView(key);
+    visibleDetailView.value = true;
 };
 
 watch(
     () => useRoute().query.booking_key,
     (newKey) => {
         if (newKey) {
-            handleDetailView({ newKey });
+            handleDetailView(newKey);
         }
     }
 );
 
-if (bookingKey) {
-    handleDetailView({ bookingKey });
+if (useRoute().query.booking_key) {
+    handleDetailView(useRoute().query.booking_key);
 }
 
 const tableLoader = ref(true);
@@ -121,6 +125,7 @@ onMounted(async () => {
         <div class="card dash-banner" style="width: 85%; margin: 0 auto; margin-top: 100px">
             <div class="d-flex mr-2">
                 <h5 class="mb-1">My Bookings</h5>
+                <!-- id rei {{ bookingKey }} -->
             </div>
             <Toolbar class="border-0 px-0">
                 <template #start> </template>

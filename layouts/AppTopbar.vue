@@ -190,6 +190,7 @@ onMounted(() => {
 
 getUserData();
 
+const logoutDialogShow = ref(false);
 const logout = () => {
     logUserOut();
     router.push('/login');
@@ -258,7 +259,7 @@ const logout = () => {
                 <i class="pi pi-user"></i>
                 <span>Profile</span>
             </button>
-            <button @click="logout" class="p-link layout-topbar-button">
+            <button @click="logoutDialogShow = true" class="p-link layout-topbar-button">
                 <i class="pi pi-sign-out"></i>
                 <span>Sign Out</span>
             </button>
@@ -266,6 +267,12 @@ const logout = () => {
         <Dialog v-model:visible="visibleProfile" modal header="Profile" dismissableMask="true" :style="{ width: '65rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <Profile :userProfile="userProfile" />
         </Dialog>
+        <Dialog v-model:visible="logoutDialogShow" modal header="Signing out?" :style="{ width: '25rem' }" dismissableMask="true">
+            <p>Are you sure you want to sign out?</p>
+            <Button label="No" icon="pi pi-times" text @click="logoutDialogShow = false" />
+            <Button label="Yes" icon="pi pi-check" :loading="btnLoading" text @click="logout" />
+        </Dialog>
+
     </div>
 </template>
 
