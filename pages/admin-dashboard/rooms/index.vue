@@ -1,7 +1,7 @@
 <script setup>
 import accessPermission from '~/composables/userTypeChecker';
 import { useFloorStore } from '~/store/floors';
-import { storeToRefs } from 'pinia'; 
+import { storeToRefs } from 'pinia';
 import { FilterMatchMode } from 'primevue/api';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
@@ -15,7 +15,6 @@ definePageMeta({
     middleware: 'auth',
     layout: 'default'
 });
-
 
 const filters = ref();
 const loading = ref(true);
@@ -75,14 +74,12 @@ const init = async () => {
     if (data.value?.length > 0) {
         roomsList.value = data.value?.map((item, index) => ({ ...item, index: index + 1 }));
         if (roomsList.value.length === 1) {
-                roomsLength.value = 1;
-                
-            }else{
-                roomsLength.value = null;
-            }
+            roomsLength.value = 1;
+        } else {
+            roomsLength.value = null;
+        }
     }
 };
-
 
 const confirmDeleteRoom = async () => {
     loading1.value = true;
@@ -93,7 +90,7 @@ const confirmDeleteRoom = async () => {
             Authorization: `Bearer ${token.value}`
         }
     });
-    
+
     if (data.value?.code === 200) {
         visibleDeleteRoom.value = false;
         toast.add({ severity: 'success', summary: 'Success', detail: 'Room deleted successfully!', group: 'br', life: 3000 });
@@ -114,7 +111,7 @@ const initFilters = () => {
     };
 };
 const tableLoader = ref(true);
-onMounted(async() => {
+onMounted(async () => {
     if (isAdmin.value === false) {
         throw createError({ statusCode: 404, message: 'Access denied!', fatal: true });
     }
@@ -157,13 +154,11 @@ initFilters();
             <Column field="floor.name" header="Floor Layout"></Column>
             <Column field="seats" header="Seat Capacity"></Column>
             <Column field="price_per_night" header="Price">
-                <template #body="slotProps"> 
-                <i>
-                    <b>
-                        $
-                    </b>
-                    {{ slotProps.data.price_per_night }}
-                </i>    
+                <template #body="slotProps">
+                    <i>
+                        <b> $ </b>
+                        {{ slotProps.data.price_per_night }}
+                    </i>
                 </template>
             </Column>
             <Column field="action" header="Action">
@@ -176,7 +171,7 @@ initFilters();
 
         <!-- Create -->
         <Dialog v-model:visible="visibleCreateRoom" modal header="Create Room" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <RoomsCreateRoom :param="{floorList}" @closeCreateModal="closeCreateModal($event)" />
+            <RoomsCreateRoom :param="{ floorList }" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit -->

@@ -52,6 +52,7 @@ const getDateCountLength = () => {
     dateDuration.value = diffDays;
 };
 
+const roomsLength = ref();
 const getRooms = async () => {
     loading.value = true;
     if ((!endDate.value) || !startDate.value) {
@@ -80,11 +81,18 @@ const getRooms = async () => {
 
     if (data.value?.length > 0) {
         roomsList.value = data.value?.map((item, index) => ({ ...item, index: index + 1 }));
+        if (roomsList.value.length === 1) {
+            roomsLength.value = 1;
+        } else {
+            roomsLength.value = null;
+        }
         getUserData();
         getDateCountLength();
         loading.value = false;
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'No rooms available!', group: 'br', life: 3000 });
+        if (roomsLength.value !== 1) {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'No rooms available!', group: 'br', life: 3000 });
+        }
         roomsList.value = [];
         loading.value = false;
     }
