@@ -9,7 +9,7 @@ const errorHandler = ref(false);
 const emit = defineEmits(['closeCreateModal']);
 
 const handleSubmitData = async () => {
-    if (name.value === '') {
+    if (name.value.trim() === '') {
         errorHandler.value = true;
         return;
     } else {
@@ -27,7 +27,7 @@ const handleSubmitData = async () => {
             });
             // return
 
-            if (data.value.code === 201) {
+            if (data.value?.code === 201) {
                 name.value = null;
                 emit('closeCreateModal', false);
                 toast.add({ severity: 'success', summary: 'Success', detail: 'Floor Created successfully!', group: 'br', life: 3000 });

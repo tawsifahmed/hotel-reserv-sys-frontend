@@ -110,27 +110,7 @@ const handleLoginSubmit = async () => {
     }
 };
 
-const handleVerifySubmit = async () => {
-    loginBtnHandle.value = true;
-    verifyUser.value.email ? (errorData.value.emailError = false) : (errorData.value.emailError = true);
-    verifyUser.value.otp ? (errorData.value.otpError = false) : (errorData.value.otpError = true);
-    if (errorData.value.emailError || errorData.value.otpError) {
-        loginBtnHandle.value = false;
-    } else {
-        await otpVerify(verifyUser.value);
-        if (authenticated.value == true) {
-            console.log('authOtpPPP', authOtp.value);
-            toast.add({ severity: 'success', summary: 'Successfully Verified', detail: resendOtpMsg, group: 'br', life: 3000 });
-            location.reload();
-            router.push('/login');
-        } else {
-            toast.add({ severity: 'error', summary: 'Verification Failed', detail: resendOtpMsg, group: 'br', life: 3000 });
-        }
-        loginBtnHandle.value = false;
-    }
-};
-
-// Reset Functionality
+// reset Functionality
 const resetEmail = ref('');
 const handleReset = () => {
     resetForm.value = 'email';
@@ -167,6 +147,7 @@ const forgotOtpHandler = async () => {
     const response = await forgotPasswordOtp(resetEmail.value, forgotOtp.value);
     if (response.code == 200) {
         confirmPasswordOtp.value = false;
+        forgotOtp.value = '';
         resetForm.value = response.message;
         loading.value = false;
         toast.add({ severity: 'success', summary: 'Success', detail: response.message, group: 'br', life: 3000 });        
@@ -195,8 +176,12 @@ const newPasswordHandler = async () => {
             resetForm.value = '';
             loginForm.value = true;
             resetForm.value = response.message;
+            resetEmail.value = '';
+            newPassword.value.password = '';
+            newPassword.value.confirm_password = '';
+
             loading.value = false;
-            toast.add({ severity: 'success', summary: 'Success', detail: response.message, group: 'br', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Success', detail: `${response.error}`, group: 'br', life: 3000 });
         } else {
             loading.value = false;
             toast.add({ severity: 'error', summary: 'Error', detail: response.message, group: 'br', life: 3000 });

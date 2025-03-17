@@ -8,18 +8,18 @@ const props = defineProps({
 });
 const toast = useToast();
 
-const id = ref(props.param.id);
+const id = ref(props.param?.id);
 
-const name = ref(props.param.name);
+const name = ref(props.param?.name);
 
-const email = ref(props.param.email);
+const email = ref(props.param?.email);
 
-const phone = ref(props.param.phone);
+const phone = ref(props.param?.phone);
 
-const address = ref(props.param.address);
+const address = ref(props.param?.address);
 
-const userType = ref(props.param.userType);
-const selectedUserType = ref({ name: props.param.userType, code: props.param.userType });
+const userType = ref(props.param?.userType);
+const selectedUserType = ref({ name: userType.value, code: userType.value });
 
 const typeList = ref([
     { name: 'admin', code: 'admin' },
@@ -35,7 +35,7 @@ const loading = ref(false);
 
 const handleSubmitData = async () => {
     loading.value = true;
-    if (name.value === '' || email.value === '') {
+    if (name.value?.trim() === '' || email.value === '') {
         errorHandler.value = true;
         loading.value = false;
         return;

@@ -174,39 +174,60 @@ onMounted(() => {
         </div>
 
         <!-- Main Content -->
-        <div class="dash">
-            <h5 v-if="roomsList?.length > 0" class="text-start mb-3 ml-2" style="text-decoration: underline">Available Rooms: {{ roomsList?.length }}</h5>
-            <div class="grid container mt-3 pt-10 flex flex-wrap justify-content-center align-items-center gap-5">
-                <div v-for="room in roomsList" :key="room" class="">
-                    <div class="mb-0 room-card">
-                        <div>
-                            <div class="bg-primary-800 w-fit px-2 py-1 room-title">
-                                <h4 v-tooltip.top="{ value: `Room no.: ${room?.name}` }" class="text-white text-center mb-0">
-                                    Room No.
-                                    <br />
-                                    <i class="trunc-text">{{ room?.name }}</i>
-                                </h4>
-                            </div>
+         <div class="second-bg relative">
 
-                            <div class="seats-info">
-                                <b>Total Seats: {{ room?.seats }}</b>
-
-                                <h5 class="m-0 mb-1">
-                                    <b class="price-info"> Price: ${{ room?.price_per_night * dateDuration }} </b>
-                                </h5>
-
-                                <h6 v-tooltip.left="{ value: `Layout: ${room?.floor?.name}` }" class="m-0 mb-3 layout-info">
-                                    <u>Layout:</u>
-                                    <br />
-                                    <i class="">{{ room.floor?.name }}</i>
-                                </h6>
-                                <Button @click="showBookingDialog(room)" label="Reserve" severity="primary" class="ml-4 mt-5" size="large" style="width: 120px; position: absolute; top: 90px;" />
-                            </div>
+             <div class="dash">
+                 <h4 v-if="roomsList?.length > 0" class="text-start mb-5 mt-2 bg-white py-3 px-6 w-fit font-bold room-count">Available Rooms: {{ roomsList?.length }}</h4>
+                 <div v-if="roomsList?.length > 0" class="grid container mt-3 pt-10 flex flex-wrap justify-content-center align-items-center gap-5">
+                     <div v-for="room in roomsList" :key="room" class="" style="box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;">
+                         <div class="mb-0 room-card">
+                             <div>
+                                 <div class="bg-primary-800 w-fit px-2 py-1 room-title">
+                                     <h4 v-tooltip.top="{ value: `Room no.: ${room?.name}` }" class="text-white text-center mb-0">
+                                         Room No.
+                                         <br />
+                                         <i class="trunc-text">{{ room?.name }}</i>
+                                     </h4>
+                                 </div>
+     
+                                 <div class="seats-info">
+                                     <b>Total Seats: {{ room?.seats }}</b>
+     
+                                     <h5 class="m-0 mb-1">
+                                         <b class="price-info"> Price: ${{ room?.price_per_night * dateDuration }} </b>
+                                     </h5>
+     
+                                     <h6 v-tooltip.left="{ value: `Layout: ${room?.floor?.name}` }" class="m-0 mb-3 layout-info">
+                                         <u>Layout:</u>
+                                         <br />
+                                         <i class="">{{ room.floor?.name }}</i>
+                                     </h6>
+                                     <Button @click="showBookingDialog(room)" label="Reserve" severity="primary" class="ml-4 mt-5" size="large" style="width: 120px; position: absolute; top: 90px;" />
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="grid h-full absolute elsi" v-else>
+                    <!-- <div class="col-12 xl:col-6 h-full"> 
+                        <div class="card h-card flex flex-column justify-content-center align-items-center">
+                            <img v-tooltip.top="{ value: 'Hotel Reservation System' }" src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
+                            <h3>Hotel Reservation System</h3>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
+                    <div class="col-12 xl:col-6 h-full"> 
+                        <div class="card h-card">
+                            <ul>
+                                <li>API  is configured in project root directory: <i>/utils/apiLink.js</i> </li>
+                                <li>Default given api link: </li>
+                                <li></li>
+                                <li></li>
+                            </ul>
+                        </div>
+                    </div> -->
+                 </div>
+             </div>
+         </div>
         <Dialog v-model:visible="visibleBookingDialog" modal header="Room Booking" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <ReservationsClientBooking :param="{bookingData}" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
@@ -239,16 +260,26 @@ onMounted(() => {
     flex-direction: column;
 }
 
+.second-bg {
+    background-image: url('../public/demo/images/Imgur1.gif');
+    background-size: contain;
+    background-position: bottom;
+    background-repeat: repeat-x;
+    overflow-y: auto;
+    max-height: calc(100vh - 370px);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    background-color: white;
+}
+
 .banner-content {
     max-width: 90%;
 }
 
 .dash {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    overflow-y: auto;
-    max-height: calc(100vh - 370px);
+    
+
     padding: 20px;
     width: 85%;
     margin: 0 auto;
@@ -315,5 +346,26 @@ onMounted(() => {
     display: block;
     width: 90px;
     padding: 0 10px;
+}
+
+.room-count {
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    text-decoration: underline; 
+    border: 3px solid black; 
+    display: flex; 
+    justify-self: center;
+    margin-bottom: 10px;
+}
+
+.elsi {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.h-card{
+    max-height: 400px;
+    min-height: 400px;
+    margin-top: 100px;
 }
 </style>

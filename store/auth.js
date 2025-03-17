@@ -84,6 +84,7 @@ export const useAuthStore = defineStore('auth', {
                 if (error.value?.data?.code === 422) {
                     this.detectDuplicateEmail = true;
                     this.userCreated = false;
+                    this.errorMessage = error.value.data?.errors;
                     console.error('Email is already registered.');
                     return;
                 }
@@ -112,7 +113,7 @@ export const useAuthStore = defineStore('auth', {
             if (data.value) {
                 return { code: 200, message: 'otp' };
             } else {
-                return { code: error.value.status, message: error.value.data.message };
+                return { code: error.value?.status, message: error.value?.data?.message };
             }
         },
         async forgotPasswordOtp(email, otp) {
@@ -128,7 +129,7 @@ export const useAuthStore = defineStore('auth', {
                 this.resetToken = data.value.token;
                 return { code: 200, message: 'new-password' };
             } else {
-                return { code: error.value.status, message: error.value.data.message };
+                return { code: error.value?.status, message: error.value?.data?.message };
             }
         },
         async passwordReset(email, password) {
@@ -152,7 +153,7 @@ export const useAuthStore = defineStore('auth', {
                 this.resetToken = '';
                 return { code: 200, message: 'Password Changed' };
             } else {
-                return { code: error.value.status, message: error.value.data.message };
+                return { code: error.value?.status, message: error.value?.data?.message };
             }
         },
         logUserOut() {

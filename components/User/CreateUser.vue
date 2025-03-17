@@ -22,7 +22,7 @@ const errorHandler = ref(false);
 const loading = ref(false);
 const handleSubmitData = async () => {
     loading.value = true;
-    if (name.value === '' || email.value === '' || password.value === '') {
+    if (name.value.trim() === '' || email.value === '' || password.value === '') {
         errorHandler.value = true;
         loading.value = false;
         return;
@@ -49,7 +49,7 @@ const handleSubmitData = async () => {
             if (error?.value) {
                 if (error?.value?.data?.code === 422) {
                     loading.value = false;
-                    toast.add({ severity: 'error', summary: 'Error', detail: 'Email already exists!', group: 'br', life: 3000 });
+                    toast.add({ severity: 'error', summary: 'Error', detail: `${error?.value?.data?.errors?.email}`, group: 'br', life: 3000 });
                     return;
                 }
             } else if (data?.value?.code === 201) {
@@ -93,7 +93,7 @@ onMounted(() => {
             <label for="email"
                 >Email address<i class="text-red-400">*</i> 
             </label>
-            <InputText type="email" v-model="email" class="w-full" placeholder="Enter Email"/>
+            <InputText type="email" v-model="email" class="w-full" placeholder="Enter Email" required/>
         </div>
         <div class="field">
             <label for="phoneNo">Phone 

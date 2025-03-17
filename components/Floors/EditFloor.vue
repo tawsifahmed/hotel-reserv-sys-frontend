@@ -19,7 +19,7 @@ const employeeForm = ref(true);
 const emit = defineEmits(['closeEditModal']);
 
 const handleSubmitData = async () => {
-    if (name.value === '') {
+    if (name.value.trim() === '') {
         errorHandler.value = true;
         return;
     } else {

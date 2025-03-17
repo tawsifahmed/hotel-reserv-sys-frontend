@@ -1,6 +1,7 @@
 <script setup>
 const url = useRuntimeConfig();
 const toast = useToast();
+const emit = defineEmits(['closeCreateModal']);
 const props = defineProps({
     param: {
         type: Object,
@@ -20,40 +21,34 @@ const getDateCountLength = () => {
     totalPrice.value = diffDays * bookingData.value.price;
 };
 getDateCountLength();
-const errorHandler = ref(false);
-
-const emit = defineEmits(['closeCreateModal']);
 
 const loading = ref(false);
 const handleSubmitData = async () => {
     loading.value = true;
-    if (!errorHandler.value) {
-        const token = useCookie('token');
-        const { data, error, pending } = await useFetch(`${url.public.apiUrl}/api/v1/reservations/store`, {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${token.value}`
-            },
-            body: {
-                room_id: bookingData.value.room_id,
-                start_date: bookingData.value.start_date,
-                end_date: bookingData.value.end_date,
-                total_price: totalPrice.value
-                // is_paid
-            }
-        });
-
-        if (data.value.code === 201) {
-            loading.value = false;
-            emit('closeCreateModal', false);
-            await toast.add({ severity: 'success', summary: 'Success', detail: 'Booking created successfully!', group: 'br', life: 3000 });
-            setTimeout(() => {
-                navigateTo({ path: `/my-bookings/` });
-            }, 2000);
-        } else {
-            loading.value = false;
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Booking creation failed!', group: 'br', life: 3000 });
+    const token = useCookie('token');
+    const { data, error, pending } = await useFetch(`${url.public.apiUrl}/api/v1/reservations/store`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        },
+        body: {
+            room_id: bookingData.value.room_id,
+            start_date: bookingData.value.start_date,
+            end_date: bookingData.value.end_date,
+            total_price: totalPrice.value
         }
+    });
+
+    if (data.value?.code === 201) {
+        loading.value = false;
+        emit('closeCreateModal', false);
+        await toast.add({ severity: 'success', summary: 'Success', detail: 'Booking created successfully!', group: 'br', life: 3000 });
+        setTimeout(() => {
+            navigateTo({ path: `/my-bookings/` });
+        }, 2000);
+    } else {
+        loading.value = false;
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Booking creation failed!', group: 'br', life: 3000 });
     }
 };
 </script>
@@ -101,7 +96,6 @@ const handleSubmitData = async () => {
                 <InputText v-model="bookingData.userData.data.email" class="w-full" disabled />
             </div>
         </div>
-        <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
         <div class="create-btn-wrapper mb-0">
             <Button label="Confirm Reservation" @click="visibleFinalConfirm = true" />
         </div>

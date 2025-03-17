@@ -6,7 +6,7 @@ import Toast from 'primevue/toast';
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useAuthStore } from '~/store/auth'; // import the auth store we just created
 const { registerUser } = useAuthStore(); // use authenticateUser action from  auth store
-const { authenticated, userCreated, detectDuplicateEmail } = storeToRefs(useAuthStore());
+const { authenticated, userCreated, detectDuplicateEmail, errorMessage } = storeToRefs(useAuthStore());
 const toast = useToast();
 const router = useRouter();
 const { layoutConfig } = useLayout();
@@ -41,10 +41,10 @@ const regBtnHandle = ref(false);
 
 const handleLoginSubmit = async () => {
     regBtnHandle.value = true;
-    createUser.value.userName ? (errorData.value.userNameError = false) : (errorData.value.userNameError = true);
-    createUser.value.email ? (errorData.value.emailError = false) : (errorData.value.emailError = true);
-    createUser.value.password ? (errorData.value.passwordError = false) : (errorData.value.passwordError = true);
-    createUser.value.confirmPass ? (errorData.value.confirmPassError = false) : (errorData.value.confirmPassError = true);
+    createUser.value?.userName?.trim() ? (errorData.value.userNameError = false) : (errorData.value.userNameError = true);
+    createUser.value?.email ? (errorData.value.emailError = false) : (errorData.value.emailError = true);
+    createUser.value?.password ? (errorData.value.passwordError = false) : (errorData.value.passwordError = true);
+    createUser.value?.confirmPass ? (errorData.value.confirmPassError = false) : (errorData.value.confirmPassError = true);
 
     if (createUser.value.confirmPass && createUser.value.password !== createUser.value.confirmPass) {
         errorData.value.confirmPassError = false;
@@ -65,7 +65,7 @@ const handleLoginSubmit = async () => {
     } else {
         await registerUser(createUser.value);
         if (detectDuplicateEmail.value === true) {
-            toast.add({ severity: 'error', summary: 'Error', detail: 'The email has already been taken', group: 'br', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Error', detail: `${errorMessage.value?.email ? errorMessage.value?.email : ''} ${errorMessage.value?.password ? errorMessage.value?.password : ''}`, group: 'br', life: 3000 });
             regBtnHandle.value = false;
             return;
         } else if (userCreated.value === true) {

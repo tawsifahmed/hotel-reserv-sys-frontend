@@ -12,7 +12,7 @@ const isAdmin = ref(accessPermission('admin'));
 
 
 const handleClick = async (element) => {
-    console.log('element =>', element.reservation_id);
+    // console.log('element =>', element.reservation_id);
     try {
         const { data, pending, error } = await useFetch(`${url.public.apiUrl}/api/v1/notifications/update/${element.id}`, {
             method: 'POST',
@@ -26,8 +26,10 @@ const handleClick = async (element) => {
         // return
         if (isAdmin.value === true){
             await navigateTo({ path: `/admin-dashboard/reservations/`, query: { booking_key: element.reservation_id } });
+            emit('closeNotification');
         } else {
             await navigateTo({ path: `/my-bookings/`, query: { booking_key: element.reservation_id } });
+            emit('closeNotification');
         }
         await fetchData();
     } catch (e) {
@@ -46,8 +48,8 @@ const fetchData = async () => {
 
         if (data.value) {
             // console.log('notification data =>', data.value);
-            notificationData.value = data.value.data;
-            totalPage.value = Math.ceil(data.value.total / 5);
+            notificationData.value = data.value?.data;
+            totalPage.value = Math.ceil(data.value?.total / 5);
         }
     } catch (e) {
         console.log(e);
@@ -72,14 +74,10 @@ const handleReadAll = async () => {
         });
 
         if (data.value) {
-
             // console.log('real all data =>', data.value);
             await fetchData();
             toast.add({ severity: 'success', summary: 'Successful', detail: 'All notifications marked as read', group: 'br', life: 3000 });
-
             loadingRead.value = false;
-            
-
         }
     } catch (e) {
         console.log(e);
@@ -106,12 +104,13 @@ const formatDate = (dateString) => {
 <template>
     <div  class="bg-white card1">
         <!-- <pre>{{ notificationData }}</pre> -->
-        <div v-if="notificationData.length > 0" v-for="notify in notificationData" :key="notify" class="">
-            <div @click="handleClick(notify)" :class="`notifyTitle ${notify.is_read === 0 ? 'unread' : ''}`">
-                <p>{{notify.text}} at {{formatDate(notify.created_at)}}</p>
-                
-            </div>
-        </div>
+         <div v-if="notificationData.length > 0">
+             <div v-for="notify in notificationData" :key="notify" class="">
+                 <div @click="handleClick(notify)" :class="`notifyTitle ${notify.is_read === 0 ? 'unread' : ''}`">
+                     <p>{{notify.text}} at {{formatDate(notify.created_at)}}</p>        
+                 </div>
+             </div>
+         </div>
         <div class="bg-white text-center text-lg" v-else>
             No notifications!
         </div>

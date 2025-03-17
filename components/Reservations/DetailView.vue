@@ -1,6 +1,8 @@
 <script setup>
 const url = useRuntimeConfig();
+const toast = useToast();
 const { resSingleData } = defineProps(['resSingleData']);
+const emit = defineEmits(['closeEditModal']);
 
 const bookingData = ref({
     id: resSingleData?.id,
@@ -18,47 +20,37 @@ const bookingData = ref({
         email: resSingleData?.user?.email
     },
     floor: {
-        name: resSingleData?.room?.floor?.name,
+        name: resSingleData?.room?.floor?.name
     },
     type: resSingleData?.type
 });
+
 const selectedStatus = ref({
     name: resSingleData?.status === 'cancelled' ? 'Cancelled' : resSingleData?.status === 'confirmed' ? 'Confirmed' : resSingleData?.status === 'pending' ? 'Pending' : resSingleData?.status.charAt(0).toUpperCase() + resSingleData?.status?.slice(1),
     code: resSingleData?.status
 });
 
-
 const statusChanged = ref(false);
-
 watch(selectedStatus, (newValue, oldValue) => {
     if (newValue.code !== oldValue.code) {
         statusChanged.value = true;
     }
 });
 
-const statusList = ref([
-    
-])
-if(resSingleData.type === 'client' && resSingleData?.status === 'pending'){
+const statusList = ref([]);
+if (resSingleData.type === 'client' && resSingleData?.status === 'pending') {
     statusList.value.push({ name: 'Pending', code: 'pending' });
     statusList.value.push({ name: 'Cancelled', code: 'cancelled' });
-}else{
+} else {
     statusList.value.push({ name: 'Pending', code: 'pending' });
     statusList.value.push({ name: 'Confirmed', code: 'confirmed' });
     statusList.value.push({ name: 'Cancelled', code: 'cancelled' });
 }
 
 
-const toast = useToast();
-
-const errorHandler = ref(false);
-
-const emit = defineEmits(['closeEditModal']);
-
 const loading = ref(false);
 const handleSubmitData = async () => {
-    loading.value = true;
-    if (!errorHandler.value) {
+    loading.value = true; 
         const token = useCookie('token');
         const { data, error, pending } = await useFetch(`${url.public.apiUrl}/api/v1/reservations/update/${bookingData.value?.id}`, {
             method: 'POST',
@@ -66,12 +58,11 @@ const handleSubmitData = async () => {
                 Authorization: `Bearer ${token.value}`
             },
             body: {
-                
                 status: selectedStatus.value.code
             }
         });
 
-        if (data.value.code === 200) {
+        if (data.value?.code === 200) {
             loading.value = false;
             emit('closeEditModal', false);
             await toast.add({ severity: 'success', summary: 'Success', detail: 'Booking updated successfully!', group: 'br', life: 3000 });
@@ -79,7 +70,6 @@ const handleSubmitData = async () => {
             loading.value = false;
             toast.add({ severity: 'error', summary: 'Error', detail: 'Booking creation failed!', group: 'br', life: 3000 });
         }
-    }
 };
 </script>
 <template>
@@ -126,22 +116,26 @@ const handleSubmitData = async () => {
         <div class="user-selection w-full flex flex-column align-items-center w-full">
             <label class="font-bold block mb-2">Booking Status:</label>
             <div class="flex justify-content-center md:w-14rem">
-                <Dropdown     :disabled="(bookingData.status === 'cancelled' || bookingData.status === 'confirmed') && bookingData.type === 'client'" display="chip" v-model="selectedStatus" :options="statusList" filter resetFilterOnHide optionLabel="name" placeholder="Select Status" class="w-full" />
+                <Dropdown
+                    :disabled="(bookingData.status === 'cancelled' || bookingData.status === 'confirmed') && bookingData.type === 'client'"
+                    display="chip"
+                    v-model="selectedStatus"
+                    :options="statusList"
+                    filter
+                    resetFilterOnHide
+                    optionLabel="name"
+                    placeholder="Select Status"
+                    class="w-full"
+                />
             </div>
         </div>
         <div class="justify-content-center align-items-center w-full my-3">
-            <p class="mb-0"
-                v-if="(bookingData.status === 'cancelled' || bookingData.status === 'confirmed') && bookingData.type === 'client'"
-                :style="{ color: bookingData.status === 'cancelled' ? 'red' : 'green', textAlign: 'center' }"
-            >
+            <p class="mb-0" v-if="(bookingData.status === 'cancelled' || bookingData.status === 'confirmed') && bookingData.type === 'client'" :style="{ color: bookingData.status === 'cancelled' ? 'red' : 'green', textAlign: 'center' }">
                 Your reservation has been {{ bookingData.status }}.
             </p>
-            <p v-if="bookingData.status === 'cancelled' && bookingData.type === 'client'" style="color: red; text-align: center;"
-            >
-                You cannot update this reservation anymore.
-            </p>
+            <p v-if="bookingData.status === 'cancelled' && bookingData.type === 'client'" style="color: red; text-align: center">You cannot update this reservation anymore.</p>
         </div>
-        
+
         <div class="create-btn-wrapper mb-0">
             <Button :loading="loading" label="Update Reservation" @click="handleSubmitData" :disabled="!statusChanged" />
         </div>

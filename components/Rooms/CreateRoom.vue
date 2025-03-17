@@ -7,20 +7,23 @@ const props = defineProps({
         required: true
     }
 });
-const floorList = ref(props.param.floorList);
+const floorList = ref(props.param?.floorList);
 
 const roomNo = ref(null);
 const selectedFloor = ref([]);
-const seatNo = ref(1);
+const seatNo = ref();
 const roomPrice = ref();
 const errorHandler = ref(false);
 
 const emit = defineEmits(['closeCreateModal']);
 const loading = ref(false);
 const handleSubmitData = async () => {
+    console.log(typeof selectedFloor.value);
+    console.log(selectedFloor.value);
     loading.value = true;
-    if (!roomNo.value || selectedFloor.value === '' || seatNo.value === '' || roomPrice.value === '') {
+    if (!roomNo.value || !selectedFloor.value?.id || !seatNo.value || !roomPrice.value) {
         errorHandler.value = true;
+        loading.value = false;
         return;
     } else {
         errorHandler.value = false;
@@ -40,7 +43,7 @@ const handleSubmitData = async () => {
             });
             // return
 
-            if (data.value.code === 201) {
+            if (data.value?.code === 201) {
                 roomNo.value = null;
                 selectedFloor.value = null;
                 seatNo.value = null;
@@ -72,7 +75,7 @@ const handleSubmitData = async () => {
         </div>
         <div class="field flex flex-column seat-no">
             <label for="company">Seat Capacity<i class="text-red-400 text-italic">*</i> </label>
-            <InputNumber v-model="seatNo" showButtons buttonLayout="horizontal" style="width: 100%; text-align: center" :min="1" :max="99">
+            <InputNumber v-model="seatNo" placeholder="Ex: 1, 2, 4, 10" showButtons buttonLayout="horizontal" style="width: 100%; text-align: center" :min="1" :max="99">
                 <template #incrementbuttonicon>
                     <span class="pi pi-plus" />
                 </template>

@@ -8,15 +8,15 @@ const props = defineProps({
 });
 const toast = useToast();
 const loading = ref(false);
-const roomId = ref(props.param.roomId);
+const roomId = ref(props.param?.roomId);
 
-const roomNo = ref(props.param.roomNo);
-const seatNo = ref(props.param.seatNo);
-const roomPrice = ref(props.param.roomPrice);
-const floorList = ref(props.param.floorList);
+const roomNo = ref(props.param?.roomNo);
+const seatNo = ref(props.param?.seatNo);
+const roomPrice = ref(props.param?.roomPrice);
+const floorList = ref(props.param?.floorList);
 const floorLayout = ref(props.param.floorLayout);
 
-const selectedFloor = ref({ name: props.param.floorLayout.name, id: props.param.floorLayout.id });
+const selectedFloor = ref({ name: props.param?.floorLayout?.name, id: props.param?.floorLayout?.id });
 
 const errorHandler = ref(false);
 
@@ -26,7 +26,7 @@ const emit = defineEmits(['closeEditModal']);
 
 const handleSubmitData = async () => {
     loading.value = true;
-    if (!roomNo.value || selectedFloor.value === '' || seatNo.value === '' || roomPrice.value === '') {
+    if (!roomNo.value || selectedFloor.value === '' || !seatNo.value || !roomPrice.value) {
         errorHandler.value = true;
         loading.value = false;
         return;
@@ -47,7 +47,7 @@ const handleSubmitData = async () => {
                 }
             });
 
-            if (data.value.code === 200) {
+            if (data.value?.code === 200) {
                 employeeForm.value = false;
                 loading.value = false;
                 emit('closeEditModal', false);
@@ -77,7 +77,7 @@ const handleSubmitData = async () => {
         </div>
         <div class="field flex flex-column seat-no">
             <label for="company">Seat Capacity<i class="text-red-400 text-italic">*</i> </label>
-            <InputNumber v-model="seatNo" showButtons buttonLayout="horizontal" style="width: 100%; text-align: center" :min="1" :max="99">
+            <InputNumber v-model="seatNo" placeholder="Ex: 1, 2, 4, 10" showButtons buttonLayout="horizontal" style="width: 100%; text-align: center" :min="1" :max="99">
                 <template #incrementbuttonicon>
                     <span class="pi pi-plus" />
                 </template>
