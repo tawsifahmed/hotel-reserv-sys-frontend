@@ -6,7 +6,8 @@ The api end point has to be configured in the utils folder -
 ./utils/apiLink.js
 
 #node version
-v19  / (nvm use 19) if not installed: nvm install 19
+nvm package required
+node v19  / (nvm use 19) if not installed: nvm install 19
 ```
 ## Setup
 ```bash

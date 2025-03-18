@@ -53,7 +53,8 @@ const getDateCountLength = () => {
 };
 
 const roomsLength = ref();
-const getRooms = async () => {
+const getRooms = async (funcCallType) => {
+    roomsLength.value = null;
     loading.value = true;
     if ((!endDate.value) || !startDate.value) {
         console.log('Dates blocked');
@@ -90,8 +91,9 @@ const getRooms = async () => {
         getDateCountLength();
         loading.value = false;
     } else {
-        if (roomsLength.value !== 1) {
+        if (roomsLength.value !== 1 && funcCallType === 'clicked') {
             toast.add({ severity: 'error', summary: 'Error', detail: 'No rooms available!', group: 'br', life: 3000 });
+            roomsLength.value = null;
         }
         roomsList.value = [];
         loading.value = false;
@@ -130,7 +132,7 @@ getFloors();
 
 const closeCreateModal = (evn) => {
     visibleBookingDialog.value = false;
-    getRooms();
+    getRooms('closed');
 };
 
 onMounted(() => {
@@ -161,13 +163,13 @@ onMounted(() => {
                         </div>
                         <div class="flex-auto">
                             <label for="icondisplay" class="font-bold block mb-2 dash-labels">Floor: (Optional) </label>
-                            <Dropdown v-model="selectedFloor" :options="floorList" filter resetFilterOnHide optionLabel="name" placeholder="Select Floor" checkmark :highlightOnSelect="true" class="w-full drop" />
+                            <Dropdown v-model="selectedFloor" showClear :options="floorList" filter resetFilterOnHide optionLabel="name" placeholder="Select Floor" checkmark :highlightOnSelect="true" class="w-full drop" />
                         </div>
                     </div>
                 </template>
 
                 <template #end>
-                    <Button @click="getRooms" class="w-full" label="Check Availability" :loading="loading" />
+                    <Button @click="getRooms('clicked')" class="w-full" label="Check Availability" :loading="loading" />
                     <Button @click="handleReset" label="Reset" severity="danger" class="ml-2" style="width: 100px" />
                 </template>
             </Toolbar>
@@ -179,7 +181,7 @@ onMounted(() => {
              <div class="dash">
                  <h4 v-if="roomsList?.length > 0" class="text-start mb-5 mt-2 bg-white py-3 px-6 w-fit font-bold room-count">Available Rooms: {{ roomsList?.length }}</h4>
                  <div v-if="roomsList?.length > 0" class="grid container mt-3 pt-10 flex flex-wrap justify-content-center align-items-center gap-5">
-                     <div v-for="room in roomsList" :key="room" class="" style="box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;">
+                     <div v-for="room in roomsList" :key="room" class="" style="box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px; border-radius: 15px;">
                          <div class="mb-0 room-card">
                              <div>
                                  <div class="bg-primary-800 w-fit px-2 py-1 room-title">
@@ -194,7 +196,7 @@ onMounted(() => {
                                      <b>Total Seats: {{ room?.seats }}</b>
      
                                      <h5 class="m-0 mb-1">
-                                         <b class="price-info"> Price: ${{ room?.price_per_night * dateDuration }} </b>
+                                         <b class="price-info">Price:${{ room?.price_per_night * dateDuration }} </b>
                                      </h5>
      
                                      <h6 v-tooltip.left="{ value: `Layout: ${room?.floor?.name}` }" class="m-0 mb-3 layout-info">

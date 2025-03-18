@@ -7,9 +7,9 @@ import { useAuthStore } from '~/store/auth'; // import the auth store we just cr
 const { passwordReset } = useAuthStore(); // use authenticateUser action from  auth store
 // const { authenticated, checkOTP, resendOtpResponse, resendOtpMsg, authOtp, resetState } = storeToRefs(useAuthStore());
 
+const toast = useToast();
 const { userProfile } = defineProps(['userProfile']);
 const { updateUser } = useUserStore();
-const toast = useToast();
 const loading = ref(false);
 const userId = ref(userProfile?.data.id);
 const userName = ref(userProfile?.data?.name);
@@ -148,6 +148,7 @@ const newPasswordHandler = async () => {
                 </div>
             </form>
         </TabPanel>
+        <Toast position="bottom-right" group="br" />
     </TabView>
 </template>
 

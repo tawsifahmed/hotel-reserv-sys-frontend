@@ -158,34 +158,21 @@ const isClient = ref(true);
 const showClientRoute = ref(false);
 const showAdminRoute = ref(false);
 onMounted(() => {
-    if (router.currentRoute.value.path === '/' || router.currentRoute.value.path === '/my-bookings') {
-        isClient.value = true;
-    } else {
-        isClient.value = false;
+    isClient.value = ['/','/my-bookings','/my-bookings/'].includes(router.currentRoute.value.path);
+
+    if (isAdmin.value && ['/','/my-bookings','/my-bookings/'].includes(router.currentRoute.value.path)) {
+        showClientRoute.value = true;
     }
 
-    if (isAdmin.value === true) {
-        if (router.currentRoute.value.path === '/' || router.currentRoute.value.path === '/my-bookings') {
-            showClientRoute.value = true;
-        }
-    }
-    if (
-            router.currentRoute.value.path === '/admin-dashboard/' ||
-            router.currentRoute.value.path === '/admin-dashboard' ||
-            router.currentRoute.value.path === '/admin-dashboard/users' ||
-            router.currentRoute.value.path === '/admin-dashboard/floors' ||
-            router.currentRoute.value.path === '/admin-dashboard/rooms' ||
-            router.currentRoute.value.path === '/admin-dashboard/reservations' ||
-            router.currentRoute.value.path === '/admin-dashboard/reports'
-        ) {
+    if (router.currentRoute.value.path.startsWith('/admin-dashboard')) {
         showAdminRoute.value = true;
-    }   
+    }
 });
 
 const isMyBookingsRoute = ref(false);
 
 onMounted(() => {
-    isMyBookingsRoute.value = router.currentRoute.value.path === '/my-bookings';
+    isMyBookingsRoute.value = ['/my-bookings', '/my-bookings/'].includes(router.currentRoute.value.path);
 });
 
 getUserData();

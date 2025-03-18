@@ -44,7 +44,7 @@ const handleSubmitData = async () => {
         emit('closeCreateModal', false);
         await toast.add({ severity: 'success', summary: 'Success', detail: 'Booking created successfully!', group: 'br', life: 3000 });
         setTimeout(() => {
-            navigateTo({ path: `/my-bookings/` });
+            navigateTo({ path: `/my-bookings` });
         }, 2000);
     } else {
         loading.value = false;
@@ -100,7 +100,7 @@ const handleSubmitData = async () => {
             <Button label="Confirm Reservation" @click="visibleFinalConfirm = true" />
         </div>
 
-        <Dialog v-model:visible="visibleFinalConfirm" header=" " modal dismissableMask="true" :style="{ width: '25rem' }">
+        <Dialog v-model:visible="visibleFinalConfirm" header="Confirm Reservation" modal dismissableMask="true" :style="{ width: '25rem' }">
             <p>Are you sure you want to confirm?</p>
             <Button label="No" icon="pi pi-times" text @click="visibleFinalConfirm = false" />
             <Button label="Yes" icon="pi pi-check" text @click="handleSubmitData" :loading="loading" />
